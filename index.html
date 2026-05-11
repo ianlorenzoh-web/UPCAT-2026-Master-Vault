@@ -175,7 +175,7 @@
         <div class="hero-banner fade-up">
           <div class="hero-eyebrow">UPCAT 2027 · Study Hub</div>
           <h2>Your <span class="gradient-text">All-in-One</span><br>UPCAT Preparation Platform</h2>
-          <p>Free reviewers, formula sheets, mock tests, study plans, and progress tracking — everything you need to pass the UPCAT, in one place.</p>
+          <p id="hero-greeting">Free reviewers, formula sheets, mock tests, study plans, and progress tracking — everything you need to pass the UPCAT, in one place.</p>
           <div class="hero-cta">
             <button class="btn btn-primary" onclick="showSection('reviewers')">
               <i class="fas fa-book-open"></i> Browse Reviewers
@@ -366,6 +366,48 @@
             <div class="custom-timer-list" id="custom-timer-list"></div>
           </div>
         </div>
+
+        <!-- Daily Quests -->
+        <div class="mb-24 fade-up">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;">⚔️ Daily Quests</div>
+          <div class="card quests-card">
+            <div id="daily-quests-list"></div>
+          </div>
+        </div>
+
+        <!-- Study Heatmap -->
+        <div class="mb-24 fade-up">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;">📅 Study Activity (18 Weeks)</div>
+          <div class="card" style="overflow-x:auto;">
+            <div id="study-heatmap"></div>
+          </div>
+        </div>
+
+        <!-- Study This Next -->
+        <div class="mb-24 fade-up">
+          <div class="card study-next-card" id="study-next-card"></div>
+        </div>
+
+        <!-- Progress Report -->
+        <div class="mb-24 fade-up">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;">📊 Progress Report</div>
+          <div class="card" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:20px 22px;">
+            <div>
+              <div style="font-weight:700;font-size:0.9rem;margin-bottom:3px;">Export Your Study Report</div>
+              <div style="font-size:0.78rem;color:var(--text-secondary);">Print or save a summary of your progress, XP, streak, and stats.</div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="printStudyReport()">
+                <i class="fas fa-print"></i> Print Report
+              </button>
+              <button class="btn btn-secondary" onclick="generateProgressCard()">
+                <i class="fas fa-image"></i> Save Card
+              </button>
+            </div>
+          </div>
+          <div id="sec-progress-report"></div>
+        </div>
+
       </section>
 
       <!-- ============ REVIEWERS ============ -->
@@ -1165,6 +1207,17 @@
 
 <!-- Script -->
 <script src="script.js"></script>
+<script>
+  // Wire new feature renders into initAll (non-destructive patch)
+  const _origInitAll = initAll;
+  function initAll() {
+    _origInitAll();
+    updateGreeting();
+    renderDailyQuests();
+    renderHeatmap('study-heatmap');
+    renderStudyNextCard();
+  }
+</script>
 <script src="pwa.js"></script>
 </body>
 </html>
