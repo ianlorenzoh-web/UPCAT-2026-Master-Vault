@@ -100,20 +100,37 @@ function showSection(id, navEl) {
 /* ----------------------------------------------------------------
    SIDEBAR MOBILE TOGGLE
    ---------------------------------------------------------------- */
+// Tracks scroll position so we can restore it after closing the sidebar.
+// overflow:hidden on body is broken on iOS Safari — position:fixed is correct.
+let _savedScrollY = 0;
+
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const ov = document.getElementById('overlay');
   const isOpen = sb.classList.toggle('open');
-  // Show/hide the dim overlay
   ov.style.display = isOpen ? 'block' : 'none';
-  // Fix #2: Lock body scroll when sidebar is open on mobile
-  document.body.classList.toggle('sidebar-open', isOpen);
+  if (isOpen) {
+    // Save current scroll position, then lock the body in place
+    _savedScrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top      = `-${_savedScrollY}px`;
+    document.body.style.width    = '100%';
+  } else {
+    // Release the body lock and restore scroll position
+    document.body.style.position = '';
+    document.body.style.top      = '';
+    document.body.style.width    = '';
+    window.scrollTo(0, _savedScrollY);
+  }
 }
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('overlay').style.display = 'none';
-  // Fix #2: Always release body scroll lock when sidebar closes
-  document.body.classList.remove('sidebar-open');
+  // Release body lock and restore scroll position
+  document.body.style.position = '';
+  document.body.style.top      = '';
+  document.body.style.width    = '';
+  window.scrollTo(0, _savedScrollY);
 }
 
 /* ----------------------------------------------------------------
