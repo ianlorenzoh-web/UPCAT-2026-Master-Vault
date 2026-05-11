@@ -66,6 +66,10 @@
         <i class="fas fa-book-open"></i> Full Reviewers
         <span class="nav-badge">4</span>
       </div>
+      <div class="nav-item" onclick="showSection('other-reviewers',this)">
+        <i class="fas fa-folder-open"></i> Other Reviewers
+        <span class="nav-badge">1</span>
+      </div>
       <div class="nav-item" onclick="showSection('topics',this)">
         <i class="fas fa-list-check"></i> Subject Topics
       </div>
@@ -362,14 +366,14 @@
           <p>Free UPCAT reviewers covering all four subtests. View directly or open in Google Drive. Mark complete to earn XP.</p>
         </div>
         <div class="grid-2" id="reviewer-grid"></div>
+      </section>
 
-        <!-- ── Other Personally Trusted Reviewers ── -->
-        <div class="reviewer-subsection-label fade-up">
-          <span class="reviewer-subsection-line"></span>
-          <span class="reviewer-subsection-text">Other Personally Trusted Reviewers</span>
-          <span class="reviewer-subsection-line"></span>
+      <!-- ============ OTHER REVIEWERS ============ -->
+      <section class="section" id="sec-other-reviewers">
+        <div class="section-header">
+          <h1>📂 Other Reviewers</h1>
+          <p>Personally trusted reviewer collections from the community. Browse the folders directly in Google Drive.</p>
         </div>
-        <p class="reviewer-subsection-desc fade-up">Curated reviewer collections from trusted sources outside the main vault. Open in Google Drive to explore.</p>
         <div class="grid-2" id="folder-reviewer-grid"></div>
       </section>
 
