@@ -326,6 +326,88 @@ function toggleBookmark(id) {
 }
 
 /* ----------------------------------------------------------------
+   FOLDER REVIEWERS — Other Personally Trusted Reviewers
+   These link to Google Drive folders (not embeddable PDFs),
+   so they use a folder-specific card layout.
+   ---------------------------------------------------------------- */
+const folderReviewers = [
+  {
+    id:'jahjah_cet',
+    title:'Jahjah\'s Super Duper Ultra Mega CET Reviewers',
+    cover:'cover-folder-a', emoji:'📂',
+    desc:'A massive collection of CET reviewer materials personally curated and compiled. Covers a wide range of subjects useful for UPCAT preparation.',
+    tags:['Folder Collection','Multi-Subject','Community Pick'], cat:'cyan',
+    credit:'Reviewer collection by Jahjah',
+    link:'https://drive.google.com/drive/folders/1uBMGBJVbp6bqM7jwLr5yEI-jaoV823jA',
+  },
+];
+
+function renderFolderReviewers() {
+  if (!state.reviewerDone)       state.reviewerDone       = {};
+  if (!state.reviewerBookmarks)  state.reviewerBookmarks  = {};
+  const grid = document.getElementById('folder-reviewer-grid');
+  if (!grid) return;
+  grid.innerHTML = folderReviewers.map(r => {
+    const done = state.reviewerDone[r.id];
+    const bkm  = state.reviewerBookmarks[r.id];
+    const catClass = r.cat === 'emerald' ? 't-emerald'
+                   : r.cat === 'amber'   ? 't-amber'
+                   : r.cat === 'cyan'    ? 't-cyan'
+                   : 't-indigo';
+    return `
+    <div class="reviewer-card fade-up" role="article" aria-label="${r.title}">
+      <div class="reviewer-cover ${r.cover}">
+        <div class="cover-overlay"></div>
+        <div class="reviewer-cover-emoji">${r.emoji}</div>
+      </div>
+      <div class="reviewer-body">
+        <div class="reviewer-title">${r.title}</div>
+        <div class="reviewer-desc">${r.desc}</div>
+        <div class="tags">${r.tags.map(t => `<span class="tag ${catClass}">${t}</span>`).join('')}</div>
+        <div class="reviewer-credit">
+          <i class="fas fa-user-circle" style="margin-right:5px;opacity:0.7;"></i>${r.credit}
+        </div>
+        <div class="progress-label"><span>Completion</span><span>${done ? '100' : '0'}%</span></div>
+        <div class="progress-track" style="margin-bottom:14px;">
+          <div class="progress-fill" style="width:${done ? '100' : '0'}%"></div>
+        </div>
+        <div class="btn-row">
+          <a href="${r.link}" target="_blank" rel="noopener noreferrer"
+             class="btn btn-primary" style="flex:1;justify-content:center;text-decoration:none;"
+             aria-label="Open ${r.title} in Google Drive">
+            <i class="fas fa-folder-open"></i> Open Folder
+          </a>
+          <button class="btn ${bkm ? 'btn-primary' : 'btn-secondary'}"
+                  onclick="toggleFolderBookmark('${r.id}')" title="Bookmark" aria-label="Bookmark ${r.title}">
+            <i class="fas fa-bookmark" style="${bkm ? 'color:#fbbf24' : ''}"></i>
+          </button>
+          <button class="btn ${done ? 'btn-success' : 'btn-secondary'}"
+                  onclick="toggleFolderReviewer('${r.id}')" title="${done ? 'Mark incomplete' : 'Mark complete'}"
+                  aria-label="${done ? 'Mark incomplete' : 'Mark complete'}">
+            <i class="fas ${done ? 'fa-check-circle' : 'fa-circle'}"></i>
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  initScrollReveal();
+}
+
+function toggleFolderReviewer(id) {
+  if (!state.reviewerDone) state.reviewerDone = {};
+  state.reviewerDone[id] = !state.reviewerDone[id];
+  saveState(); renderFolderReviewers(); updateDashboardStats();
+  showToast(state.reviewerDone[id] ? '📂 Folder reviewer marked as complete! +50 XP' : 'Reviewer unmarked.');
+}
+
+function toggleFolderBookmark(id) {
+  if (!state.reviewerBookmarks) state.reviewerBookmarks = {};
+  state.reviewerBookmarks[id] = !state.reviewerBookmarks[id];
+  saveState(); renderFolderReviewers();
+  showToast(state.reviewerBookmarks[id] ? '🔖 Reviewer bookmarked!' : 'Bookmark removed.');
+}
+
+/* ----------------------------------------------------------------
    SUBJECTS / TOPICS
    ---------------------------------------------------------------- */
 const subjects = [
@@ -1269,6 +1351,7 @@ function initAll() {
   setRandomQuote();
   updateCountdown();
   renderReviewers();
+  renderFolderReviewers();
   renderTopics();
   renderPlans();
   renderFormulas();
