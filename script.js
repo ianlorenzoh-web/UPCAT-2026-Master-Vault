@@ -843,6 +843,43 @@ function handleSearch(val) {
 }
 
 /* ----------------------------------------------------------------
+   NOTIFICATION & ALERT SYSTEM
+   Fire once on timer completion: browser notification + beep + toast + vibration.
+   ---------------------------------------------------------------- */
+function requestNotifPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function fireTimerAlert(title, body) {
+  // 1. Browser notification (if permitted)
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try { new Notification(title, { body, icon: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>' }); } catch(e) {}
+  }
+  // 2. Web Audio beep — two-tone chime, no external files needed
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[880, 0, 0.18], [1100, 0.2, 0.18], [880, 0.42, 0.25]].forEach(([freq, start, dur]) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine'; osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, ctx.currentTime + start);
+      gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + start + 0.02);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + start + dur);
+      osc.start(ctx.currentTime + start);
+      osc.stop(ctx.currentTime + start + dur + 0.05);
+    });
+    setTimeout(() => ctx.close(), 1000);
+  } catch(e) {}
+  // 3. Toast
+  showToast(`${title} — ${body}`);
+  // 4. Vibration (Android; iOS ignores silently)
+  if ('vibrate' in navigator) navigator.vibrate([200, 100, 200, 100, 400]);
+}
+
+/* ----------------------------------------------------------------
    POMODORO TIMER — Enhanced with custom time input
    ---------------------------------------------------------------- */
 let pomoRunning=false, pomoTime=25*60, pomoTotal=25*60, pomoInterval=null, pomoMode='work';
@@ -853,8 +890,8 @@ function setCustomPomo() {
   const min = parseInt(document.getElementById('pomo-min-input').value) || 0;
   const totalSec = (hrs * 3600) + (min * 60);
   if (totalSec < 60) { showToast('⚠️ Please set at least 1 minute.'); return; }
-  // Stop any running timer before applying
-  clearInterval(pomoInterval); pomoRunning=false;
+  // Always clear before reassigning — prevents interval leak
+  clearInterval(pomoInterval); pomoInterval=null; pomoRunning=false;
   pomoTime = totalSec; pomoTotal = totalSec; pomoMode='work';
   document.getElementById('pomo-start').textContent='Start';
   document.getElementById('pomo-mode-label').textContent = 'CUSTOM FOCUS SESSION';
@@ -864,21 +901,26 @@ function setCustomPomo() {
 
 function togglePomo() {
   if (pomoRunning) {
-    clearInterval(pomoInterval); pomoRunning=false;
+    // Pause: clear interval, null it out to prevent stale ref leak
+    clearInterval(pomoInterval); pomoInterval=null; pomoRunning=false;
     document.getElementById('pomo-start').textContent='Resume';
   } else {
+    // Guard: never start a second interval if one somehow exists
+    if (pomoInterval) { clearInterval(pomoInterval); pomoInterval=null; }
     pomoRunning=true;
+    // Request notification permission on first start
+    requestNotifPermission();
     document.getElementById('pomo-start').textContent='Pause';
     pomoInterval=setInterval(()=>{
       pomoTime--;
       if (pomoTime<=0) {
-        clearInterval(pomoInterval); pomoRunning=false;
+        clearInterval(pomoInterval); pomoInterval=null; pomoRunning=false;
         if(pomoMode==='work'){
-          showToast('✅ Focus session done! Take a 5-min break.');
+          fireTimerAlert('✅ Focus Session Complete', 'Great work! Take a 5-minute break.');
           pomoMode='break'; pomoTime=5*60; pomoTotal=5*60;
           document.getElementById('pomo-mode-label').textContent='BREAK TIME';
         } else {
-          showToast('🔋 Break done! Time to focus.');
+          fireTimerAlert('🔋 Break Over', 'Time to focus again!');
           pomoMode='work'; pomoTime=25*60; pomoTotal=25*60;
           document.getElementById('pomo-mode-label').textContent='FOCUS SESSION';
         }
@@ -889,7 +931,7 @@ function togglePomo() {
   }
 }
 function resetPomo() {
-  clearInterval(pomoInterval); pomoRunning=false;
+  clearInterval(pomoInterval); pomoInterval=null; pomoRunning=false;
   pomoTime=25*60; pomoTotal=25*60; pomoMode='work';
   document.getElementById('pomo-start').textContent='Start';
   if(document.getElementById('pomo-mode-label'))
@@ -929,14 +971,18 @@ function toggleCustomTimer(id) {
   const t = customTimers.find(t=>t.id===id);
   if (!t || t.remaining<=0) return;
   if (t.running) {
-    clearInterval(t.interval); t.running=false;
+    clearInterval(t.interval); t.interval=null; t.running=false;
   } else {
+    // Guard: clear any stale interval ref before starting
+    if (t.interval) { clearInterval(t.interval); t.interval=null; }
     t.running=true;
+    // Request notification permission on first timer start
+    requestNotifPermission();
     t.interval=setInterval(()=>{
       t.remaining--;
       if (t.remaining<=0) {
-        clearInterval(t.interval); t.running=false; t.remaining=0;
-        showToast(`🔔 "${t.name}" timer finished!`);
+        clearInterval(t.interval); t.interval=null; t.running=false; t.remaining=0;
+        fireTimerAlert(`⏰ "${t.name}" Done!`, 'Your timer has finished.');
       }
       renderCustomTimers();
     },1000);
@@ -1069,8 +1115,104 @@ function initScrollReveal() {
 }
 
 /* ----------------------------------------------------------------
-   RESET DATA
+   LIVE VISITOR COUNTER — BroadcastChannel + localStorage
+   Works across tabs in the same browser. Honest about its scope:
+   this tracks open tabs, not unique internet users. No backend needed.
    ---------------------------------------------------------------- */
+const PRESENCE_KEY  = 'upcat_presence_v1';
+const PRESENCE_TTL  = 8000;   // ms — tab considered alive if heartbeat < 8s old
+const HEARTBEAT_INT = 4000;   // ms — how often each tab writes its heartbeat
+const _tabId = `tab_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+let _presenceChannel = null;
+let _heartbeatTimer  = null;
+
+function _writeHeartbeat() {
+  try {
+    const now = Date.now();
+    const data = JSON.parse(localStorage.getItem(PRESENCE_KEY) || '{}');
+    // Write this tab's timestamp
+    data[_tabId] = now;
+    // Evict stale tabs (no heartbeat for > TTL)
+    Object.keys(data).forEach(k => { if (now - data[k] > PRESENCE_TTL) delete data[k]; });
+    localStorage.setItem(PRESENCE_KEY, JSON.stringify(data));
+    _updateCounterUI(Object.keys(data).length);
+  } catch(e) {}
+}
+
+function _removeHeartbeat() {
+  try {
+    const data = JSON.parse(localStorage.getItem(PRESENCE_KEY) || '{}');
+    delete data[_tabId];
+    localStorage.setItem(PRESENCE_KEY, JSON.stringify(data));
+    if (_presenceChannel) _presenceChannel.postMessage('update');
+  } catch(e) {}
+}
+
+function _updateCounterUI(count) {
+  const el = document.getElementById('visitor-count');
+  if (el) el.textContent = count;
+  const label = document.getElementById('visitor-label');
+  if (label) label.textContent = count === 1 ? 'student studying now' : 'students studying now';
+}
+
+function initPresence() {
+  // Immediately write heartbeat
+  _writeHeartbeat();
+  // Repeat heartbeat every 4s to stay "alive"
+  _heartbeatTimer = setInterval(() => {
+    _writeHeartbeat();
+    if (_presenceChannel) _presenceChannel.postMessage('update');
+  }, HEARTBEAT_INT);
+
+  // BroadcastChannel: receive updates from other tabs instantly
+  if ('BroadcastChannel' in window) {
+    _presenceChannel = new BroadcastChannel('upcat_presence');
+    _presenceChannel.onmessage = () => {
+      try {
+        const now = Date.now();
+        const data = JSON.parse(localStorage.getItem(PRESENCE_KEY) || '{}');
+        const live = Object.values(data).filter(ts => now - ts <= PRESENCE_TTL).length;
+        _updateCounterUI(live);
+      } catch(e) {}
+    };
+  }
+
+  // Also listen for storage events (cross-tab on browsers that don't support BroadcastChannel)
+  window.addEventListener('storage', (e) => {
+    if (e.key === PRESENCE_KEY) {
+      try {
+        const now = Date.now();
+        const data = JSON.parse(e.newValue || '{}');
+        const live = Object.values(data).filter(ts => now - ts <= PRESENCE_TTL).length;
+        _updateCounterUI(live);
+      } catch(e2) {}
+    }
+  });
+
+  // Cleanup on tab close / navigation away
+  window.addEventListener('beforeunload', () => {
+    clearInterval(_heartbeatTimer);
+    _removeHeartbeat();
+    if (_presenceChannel) { _presenceChannel.close(); _presenceChannel = null; }
+  });
+
+  // Also cleanup on visibility change (mobile app-switch, screen lock)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      clearInterval(_heartbeatTimer);
+      _heartbeatTimer = null;
+    } else {
+      // Tab is visible again — resume heartbeat
+      _writeHeartbeat();
+      _heartbeatTimer = setInterval(() => {
+        _writeHeartbeat();
+        if (_presenceChannel) _presenceChannel.postMessage('update');
+      }, HEARTBEAT_INT);
+    }
+  });
+}
+
+
 function resetData() {
   if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
     localStorage.removeItem('upcat_state_v4');
@@ -1099,5 +1241,6 @@ function initAll() {
   updateDashboardStats();
   updatePomoDisplay();
   renderCustomTimers();
+  initPresence();
   setTimeout(initScrollReveal, 300);
 }
