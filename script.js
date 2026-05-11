@@ -7,8 +7,27 @@
    STATE MANAGEMENT
    ---------------------------------------------------------------- */
 let state = {};
+
+const STATE_VERSION = 5;
+function migrateState(s) {
+  if (!s.dailyQuests)       s.dailyQuests = {};
+  if (!s.questLastReset)    s.questLastReset = null;
+  if (!s.flashcardDecks)    s.flashcardDecks = {};
+  if (!s.wrongAnswers)      s.wrongAnswers = [];
+  if (!s.heatmap)           s.heatmap = {};
+  if (!s.totalStudyMinutes) s.totalStudyMinutes = 0;
+  if (!s.lastActiveSection) s.lastActiveSection = 'dashboard';
+  if (!s.sessions)          s.sessions = [];
+  if (!s.streakFreezes)     s.streakFreezes = 0;
+  if (!s.longestStreak)     s.longestStreak = 0;
+  s._version = STATE_VERSION;
+  return s;
+}
 function loadState() {
-  try { state = JSON.parse(localStorage.getItem('upcat_state_v4') || '{}'); } catch(e) { state = {}; }
+  try {
+    const raw = JSON.parse(localStorage.getItem('upcat_state_v4') || '{}');
+    state = migrateState(raw);
+  } catch(e) { state = migrateState({}); }
 }
 function saveState() {
   try { localStorage.setItem('upcat_state_v4', JSON.stringify(state)); } catch(e) {}
@@ -322,7 +341,13 @@ function toggleReviewer(id) {
   if (!state.reviewerDone) state.reviewerDone = {};
   state.reviewerDone[id] = !state.reviewerDone[id];
   saveState(); renderReviewers(); updateDashboardStats();
-  showToast(state.reviewerDone[id] ? '📚 Reviewer marked as complete! +50 XP' : 'Reviewer unmarked.');
+  if (state.reviewerDone[id]) {
+    recordStudyActivity('reviewer');
+    advanceQuest('reviewer', 1);
+    showToast('📚 Reviewer marked as complete! +50 XP');
+  } else {
+    showToast('Reviewer unmarked.');
+  }
 }
 function toggleBookmark(id) {
   if (!state.reviewerBookmarks) state.reviewerBookmarks = {};
@@ -470,7 +495,13 @@ function toggleTopic(key) {
   if (!state.topics) state.topics = {};
   state.topics[key] = !state.topics[key];
   saveState(); renderTopics(); updateDashboardStats();
-  showToast(state.topics[key] ? '✅ Topic checked! +10 XP' : 'Topic unchecked.');
+  if (state.topics[key]) {
+    recordStudyActivity('topic');
+    advanceQuest('topics', 1);
+    showToast('✅ Topic checked! +10 XP');
+  } else {
+    showToast('Topic unchecked.');
+  }
 }
 
 /* Fix #9: Single delegated click listener on the topics container.
@@ -674,12 +705,20 @@ function addTask() {
   state.tasks.unshift({ text, priority: document.getElementById('taskPriority').value, done: false, id: Date.now() });
   input.value = '';
   saveState(); renderTasks(); updateDashboardStats();
+  recordStudyActivity('task_add');
+  advanceQuest('task_add', 1);
   showToast('✅ Task added! +5 XP');
 }
 function toggleTask(i) {
   state.tasks[i].done = !state.tasks[i].done;
   saveState(); renderTasks(); updateDashboardStats();
-  showToast(state.tasks[i].done ? '✅ Task complete! +15 XP' : 'Task unchecked.');
+  if (state.tasks[i].done) {
+    recordStudyActivity('task');
+    advanceQuest('task_done', 1);
+    showToast('✅ Task complete! +15 XP');
+  } else {
+    showToast('Task unchecked.');
+  }
 }
 function deleteTask(i) {
   state.tasks.splice(i, 1);
@@ -855,7 +894,13 @@ function toggleMock(id) {
   if (!state.mocksDone) state.mocksDone = {};
   state.mocksDone[id] = !state.mocksDone[id];
   saveState(); renderMocks(); updateDashboardStats();
-  showToast(state.mocksDone[id] ? '📝 Mock test complete! +30 XP' : 'Mock test unmarked.');
+  if (state.mocksDone[id]) {
+    recordStudyActivity('mock');
+    advanceQuest('reviewer', 1);
+    showToast('📝 Mock test complete! +30 XP');
+  } else {
+    showToast('Mock test unmarked.');
+  }
 }
 
 /* ----------------------------------------------------------------
@@ -1005,6 +1050,7 @@ function togglePomo() {
         clearInterval(pomoInterval); pomoInterval=null; pomoRunning=false;
         if(pomoMode==='work'){
           fireTimerAlert('✅ Focus Session Complete', 'Great work! Take a 5-minute break.');
+          onPomoComplete();
           pomoMode='break'; pomoTime=5*60; pomoTotal=5*60;
           document.getElementById('pomo-mode-label').textContent='BREAK TIME';
         } else {
@@ -1147,14 +1193,40 @@ function renderCustomTimers() {
 }
 
 /* ----------------------------------------------------------------
-   STREAK
+   ACTIVITY-GATED STREAK + HEATMAP DATA
    ---------------------------------------------------------------- */
+function recordStudyActivity(type) {
+  const today = new Date().toDateString();
+  if (!state.heatmap) state.heatmap = {};
+  state.heatmap[today] = (state.heatmap[today] || 0) + 1;
+
+  if (state.lastActiveDay !== today) {
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    state.streak = state.lastActiveDay === yesterday ? (state.streak || 0) + 1 : 1;
+    state.lastActiveDay = today;
+    if (state.streak > (state.longestStreak || 0)) state.longestStreak = state.streak;
+  }
+  saveState();
+  if (typeof updateDashboardStats === 'function') updateDashboardStats();
+}
+
 function checkStreak() {
-  const today=new Date().toDateString();
-  if(state.lastVisit!==today){
-    const yesterday=new Date(Date.now()-86400000).toDateString();
-    state.streak=state.lastVisit===yesterday?(state.streak||0)+1:1;
-    state.lastVisit=today;
+  const today = new Date().toDateString();
+  if (state.lastActiveDay === today) return;
+
+  const yesterday  = new Date(Date.now() - 86400000).toDateString();
+  const twoDaysAgo = new Date(Date.now() - 172800000).toDateString();
+
+  if (state.lastActiveDay === yesterday) {
+    return; // real activity will advance streak via recordStudyActivity
+  } else if (state.lastActiveDay === twoDaysAgo && (state.streakFreezes || 0) > 0) {
+    state.streakFreezes--;
+    state.lastActiveDay = today;
+    showToast('🛡️ Streak Freeze used! Your streak is protected.');
+    saveState();
+  } else if (state.lastActiveDay && state.lastActiveDay !== today) {
+    if ((state.streak || 0) > (state.longestStreak || 0)) state.longestStreak = state.streak;
+    state.streak = 0;
     saveState();
   }
 }
@@ -1344,6 +1416,341 @@ function resetData() {
     showToast('🔄 All data has been reset.');
   }
 }
+
+/* ================================================================
+   ROADMAP FEATURES — Added from Feature Roadmap v1
+   ================================================================ */
+
+/* ----------------------------------------------------------------
+   DAILY QUESTS SYSTEM (Feature 1)
+   ---------------------------------------------------------------- */
+const QUEST_POOL = [
+  { id:'q_topic_2',    text:'Complete 2 topics',           target:2,  type:'topics',    xp:30  },
+  { id:'q_topic_5',    text:'Complete 5 topics',           target:5,  type:'topics',    xp:60  },
+  { id:'q_formula_3',  text:'Bookmark 3 formulas',         target:3,  type:'formulas',  xp:25  },
+  { id:'q_task_add',   text:'Add a study task',            target:1,  type:'task_add',  xp:20  },
+  { id:'q_task_done',  text:'Complete a task',             target:1,  type:'task_done', xp:25  },
+  { id:'q_pomodoro',   text:'Complete a Pomodoro session', target:1,  type:'pomodoro',  xp:40  },
+  { id:'q_reviewer',   text:'Open a reviewer',             target:1,  type:'reviewer',  xp:20  },
+  { id:'q_streak',     text:'Maintain your streak',        target:1,  type:'streak',    xp:50  },
+  { id:'q_formula_10', text:'Study 10 formulas',           target:10, type:'formulas',  xp:45  },
+  { id:'q_subj_all',   text:'Touch all 8 subjects today',  target:8,  type:'subjects',  xp:80  },
+];
+
+function getDailyQuests() {
+  const today = new Date().toDateString();
+  if (state.questLastReset !== today || !state.dailyQuests || !state.dailyQuests.quests) {
+    const shuffled = QUEST_POOL.slice().sort(() => Math.random() - 0.5);
+    state.dailyQuests = { date: today, quests: shuffled.slice(0,3).map(q => ({...q, progress:0, done:false})) };
+    state.questLastReset = today;
+    saveState();
+  }
+  return state.dailyQuests.quests;
+}
+
+function advanceQuest(type, amount = 1) {
+  if (!state.dailyQuests || !state.dailyQuests.quests) return;
+  let changed = false;
+  state.dailyQuests.quests.forEach(q => {
+    if (q.type === type && !q.done && amount > 0) {
+      q.progress = Math.min(q.target, (q.progress || 0) + amount);
+      if (q.progress >= q.target) {
+        q.done = true;
+        showToast(`🎯 Quest complete: "${q.text}"! +${q.xp} XP`);
+        burstConfetti();
+        changed = true;
+      }
+    }
+  });
+  if (changed) { saveState(); }
+  renderDailyQuests();
+}
+
+function renderDailyQuests() {
+  const el = document.getElementById('daily-quests-list');
+  if (!el) return;
+  const quests = getDailyQuests();
+  el.innerHTML = quests.map(q => {
+    const pct = Math.min(100, Math.round(((q.progress||0)/q.target)*100));
+    return `
+    <div class="quest-row ${q.done?'quest-done':''}">
+      <div class="quest-info">
+        <div class="quest-text">${q.done ? '✓ ' : ''}${q.text}</div>
+        <div class="quest-progress-bar"><div class="quest-progress-fill" style="width:${pct}%"></div></div>
+        <div class="quest-progress-label">${q.progress||0} / ${q.target}</div>
+      </div>
+      <div class="quest-xp-badge">+${q.xp} XP</div>
+    </div>`;
+  }).join('');
+}
+
+/* ----------------------------------------------------------------
+   CONFETTI BURST (Feature 2)
+   ---------------------------------------------------------------- */
+function burstConfetti(x, y) {
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+
+  const particles = Array.from({length:60}, () => ({
+    x: x || canvas.width / 2, y: y || canvas.height / 3,
+    vx: (Math.random() - 0.5) * 12, vy: Math.random() * -12 - 4,
+    color: ['#6366f1','#22d3ee','#34d399','#fbbf24','#f43f5e','#a78bfa'][Math.floor(Math.random()*6)],
+    size: Math.random() * 7 + 3, gravity: 0.35, life: 1
+  }));
+
+  function frame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += p.gravity; p.life -= 0.018;
+      if (p.life > 0) {
+        alive = true;
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.size, p.size * 0.5);
+      }
+    });
+    if (alive) requestAnimationFrame(frame);
+    else document.body.removeChild(canvas);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ----------------------------------------------------------------
+   STUDY HEATMAP (Feature 3)
+   ---------------------------------------------------------------- */
+function renderHeatmap(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const heatmap = state.heatmap || {};
+  const today = new Date();
+  const weeks = 18;
+  const days = weeks * 7;
+  const cells = [];
+
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = d.toDateString();
+    const count = heatmap[key] || 0;
+    const level = count === 0 ? 0 : count < 3 ? 1 : count < 6 ? 2 : count < 10 ? 3 : 4;
+    cells.push({ key, count, level, label: d.toLocaleDateString('en-PH', {month:'short', day:'numeric'}) });
+  }
+
+  el.innerHTML = `
+    <div class="heatmap-grid">
+      ${cells.map(c => `<div class="heatmap-cell level-${c.level}" title="${c.label}: ${c.count} activities"></div>`).join('')}
+    </div>
+    <div class="heatmap-legend">
+      <span style="color:var(--text-muted);font-size:0.7rem;">Less</span>
+      ${[0,1,2,3,4].map(l => `<div class="heatmap-cell level-${l}"></div>`).join('')}
+      <span style="color:var(--text-muted);font-size:0.7rem;">More</span>
+    </div>`;
+}
+
+/* ----------------------------------------------------------------
+   SHAREABLE PROGRESS CARD (Feature 4)
+   ---------------------------------------------------------------- */
+function getRankName(xp) {
+  let name = RANKS[0][1];
+  for (let i = RANKS.length-1; i >= 0; i--) { if(xp >= RANKS[i][0]){ name = RANKS[i][1]; break; } }
+  return name;
+}
+
+async function generateProgressCard() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080; canvas.height = 566;
+  const ctx = canvas.getContext('2d');
+  const xp = calcXP();
+  const streak = state.streak || 0;
+  const topicsDone = Object.values(state.topics||{}).filter(Boolean).length;
+
+  const grad = ctx.createLinearGradient(0, 0, 1080, 566);
+  grad.addColorStop(0, '#050711'); grad.addColorStop(1, '#0e1226');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, 1080, 566);
+
+  const glow = ctx.createRadialGradient(200, 200, 10, 200, 200, 350);
+  glow.addColorStop(0, 'rgba(99,102,241,0.25)'); glow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, 1080, 566);
+
+  ctx.fillStyle = '#6366f1'; ctx.font = 'bold 28px sans-serif';
+  ctx.fillText('⚡ UPCAT 2027 Master Vault', 60, 70);
+  ctx.fillStyle = '#8b95c8'; ctx.font = '18px sans-serif';
+  ctx.fillText('My Study Progress — ' + new Date().toLocaleDateString('en-PH', {month:'long', year:'numeric'}), 60, 105);
+
+  const stats = [
+    { label:'Total XP',    value: xp.toLocaleString(),    color:'#a5b4fc' },
+    { label:'Day Streak',  value: streak + ' 🔥',         color:'#fbbf24' },
+    { label:'Topics Done', value: topicsDone + '/106',    color:'#34d399' },
+    { label:'Rank',        value: getRankName(xp),        color:'#818cf8' },
+  ];
+  stats.forEach((s, i) => {
+    const x = 60 + (i % 2) * 500, y = 200 + Math.floor(i / 2) * 130;
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    ctx.roundRect(x, y, 460, 100, 12); ctx.fill();
+    ctx.fillStyle = s.color; ctx.font = 'bold 44px sans-serif';
+    ctx.fillText(s.value, x + 24, y + 58);
+    ctx.fillStyle = '#4a527a'; ctx.font = '18px sans-serif';
+    ctx.fillText(s.label, x + 24, y + 84);
+  });
+
+  ctx.fillStyle = '#4a527a'; ctx.font = '16px sans-serif';
+  ctx.fillText('ianlorenzoh-web.github.io/UPCAT-2027-Master-Vault', 60, 530);
+
+  const link = document.createElement('a');
+  link.download = 'my-upcat-progress.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('📸 Progress card saved! Share it!');
+}
+
+/* ----------------------------------------------------------------
+   PERSONALIZED DASHBOARD GREETING (Feature 6)
+   ---------------------------------------------------------------- */
+function getDashboardGreeting() {
+  const hour = new Date().getHours();
+  const streak = state.streak || 0;
+  const xp = calcXP();
+  const topicsDone = Object.values(state.topics||{}).filter(Boolean).length;
+  const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+  if (streak >= 30) return `${timeGreeting}, legend. 🔥 ${streak}-day streak. You're built different.`;
+  if (streak >= 7)  return `${timeGreeting}! 🔥 ${streak} days strong. Don't break it now.`;
+  if (streak === 0) return `${timeGreeting}. Ready to start your streak today? 💪`;
+  if (xp >= 1000)   return `${timeGreeting}, ${getRankName(xp)}. Let's keep building.`;
+  if (topicsDone === 0) return `${timeGreeting}! Pick a subject and complete your first topic. 🎯`;
+  return `${timeGreeting}! ${topicsDone} topics done. You're making real progress. 📚`;
+}
+
+function updateGreeting() {
+  const el = document.getElementById('hero-greeting');
+  if (el) el.textContent = getDashboardGreeting();
+}
+
+/* ----------------------------------------------------------------
+   SMART "STUDY THIS NEXT" SUGGESTION (Feature 10)
+   ---------------------------------------------------------------- */
+function getNextTopicSuggestion() {
+  const subjectCompletion = subjects.map(s => ({
+    subject: s,
+    pct: s.topics.filter(t => state.topics?.[s.id+'::'+t]).length / s.topics.length
+  })).sort((a, b) => a.pct - b.pct);
+
+  for (const { subject } of subjectCompletion) {
+    const nextTopic = subject.topics.find(t => !state.topics?.[subject.id+'::'+t]);
+    if (nextTopic) return { subject: subject.name, topic: nextTopic, id: subject.id, color: subject.color, icon: subject.icon };
+  }
+  return null;
+}
+
+function renderStudyNextCard() {
+  const el = document.getElementById('study-next-card');
+  if (!el) return;
+  const suggestion = getNextTopicSuggestion();
+  if (!suggestion) {
+    el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--emerald);">🎉 All topics completed! You're ready.</div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="study-next-inner">
+      <div class="study-next-label">⚡ Study This Next</div>
+      <div class="study-next-subject" style="color:${suggestion.color};">${suggestion.icon} ${suggestion.subject}</div>
+      <div class="study-next-topic">${suggestion.topic}</div>
+      <button class="btn btn-primary" onclick="showSection('topics')">Start →</button>
+    </div>`;
+}
+
+/* ----------------------------------------------------------------
+   MISTAKE NOTEBOOK (Feature 8)
+   ---------------------------------------------------------------- */
+function addMistake(subject, topic, note) {
+  if (!state.wrongAnswers) state.wrongAnswers = [];
+  state.wrongAnswers.unshift({
+    id: Date.now(), subject, topic, note,
+    date: new Date().toISOString().split('T')[0],
+    reviewed: false
+  });
+  if (state.wrongAnswers.length > 200) state.wrongAnswers = state.wrongAnswers.slice(0, 200);
+  saveState();
+  showToast('📓 Added to mistake notebook!');
+}
+
+function toggleMistakeReviewed(id) {
+  const m = (state.wrongAnswers||[]).find(x => x.id === id);
+  if (m) { m.reviewed = !m.reviewed; saveState(); }
+}
+
+/* ----------------------------------------------------------------
+   STUDY SESSION LOGGER (Feature 14)
+   ---------------------------------------------------------------- */
+function onPomoComplete() {
+  const minutes = Math.round(pomoTotal / 60);
+  state.totalStudyMinutes = (state.totalStudyMinutes || 0) + minutes;
+
+  const today = new Date().toDateString();
+  if (!state.heatmap) state.heatmap = {};
+  state.heatmap[today] = (state.heatmap[today] || 0) + 3;
+
+  if (!state.sessions) state.sessions = [];
+  state.sessions.push({ date: new Date().toISOString(), minutes, type: 'pomodoro' });
+  if (state.sessions.length > 90) state.sessions = state.sessions.slice(-90);
+
+  recordStudyActivity('pomodoro');
+  advanceQuest('pomodoro', 1);
+  saveState();
+  updateDashboardStats();
+  renderHeatmap('study-heatmap');
+}
+
+/* ----------------------------------------------------------------
+   EXPORTABLE STUDY REPORT (Feature 15)
+   ---------------------------------------------------------------- */
+function printStudyReport() {
+  const el = document.getElementById('sec-progress-report');
+  if (!el) return;
+  const xp = calcXP();
+  const topicsDone = Object.values(state.topics||{}).filter(Boolean).length;
+  const reviewersDone = Object.values(state.reviewerDone||{}).filter(Boolean).length;
+  const mocksDone = Object.values(state.mocksDone||{}).filter(Boolean).length;
+  const hours = Math.floor((state.totalStudyMinutes||0) / 60);
+  const mins = (state.totalStudyMinutes||0) % 60;
+
+  el.innerHTML = `
+    <div style="padding:40px;font-family:Inter,sans-serif;color:#111;">
+      <h1 style="margin:0 0 4px;">⚡ UPCAT 2027 Master Vault</h1>
+      <p style="color:#666;margin:0 0 32px;">Study Progress Report · Generated ${new Date().toLocaleDateString('en-PH',{dateStyle:'full'})}</p>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:32px;">
+        <tr style="background:#f4f4f8;"><th style="padding:10px;text-align:left;border:1px solid #ddd;">Metric</th><th style="padding:10px;text-align:right;border:1px solid #ddd;">Value</th></tr>
+        <tr><td style="padding:10px;border:1px solid #ddd;">Total XP</td><td style="padding:10px;text-align:right;border:1px solid #ddd;">${xp} XP</td></tr>
+        <tr><td style="padding:10px;border:1px solid #ddd;">Current Rank</td><td style="padding:10px;text-align:right;border:1px solid #ddd;">${getRankName(xp)}</td></tr>
+        <tr><td style="padding:10px;border:1px solid #ddd;">Streak</td><td style="padding:10px;text-align:right;border:1px solid #ddd;">${state.streak||0} days 🔥</td></tr>
+        <tr><td style="padding:10px;border:1px solid #ddd;">Longest Streak</td><td style="padding:10px;text-align:right;border:1px solid #ddd;">${state.longestStreak||0} days</td></tr>
+        <tr><td style="padding:10px;border:1px solid #ddd;">Topics Completed</td><td style="padding:10px;text-align:right;border:1px solid #ddd;">${topicsDone} / 106</td></tr>
+        <tr><td style="padding:10px;border:1px solid #ddd;">Reviewers Completed</td><td style="padding:10px;text-align:right;border:1px solid #ddd;">${reviewersDone} / 5</td></tr>
+        <tr><td style="padding:10px;border:1px solid #ddd;">Mock Tests Done</td><td style="padding:10px;text-align:right;border:1px solid #ddd;">${mocksDone} / 4</td></tr>
+        <tr><td style="padding:10px;border:1px solid #ddd;">Total Study Time</td><td style="padding:10px;text-align:right;border:1px solid #ddd;">${hours}h ${mins}m</td></tr>
+      </table>
+      <p style="color:#999;font-size:12px;">Generated by UPCAT 2027 Master Vault · Free for all UPCAT aspirants · Made by Ian Lorenzo Herico</p>
+    </div>`;
+  window.print();
+}
+
+/* ----------------------------------------------------------------
+   FORMULA BOOKMARK QUEST TRACKING
+   ---------------------------------------------------------------- */
+const _origBookmarkFormula = bookmarkFormula;
+function bookmarkFormula(name) {
+  _origBookmarkFormula(name);
+  if (state.formulaBookmarks && state.formulaBookmarks[name]) {
+    advanceQuest('formulas', 1);
+    recordStudyActivity('formula');
+  }
+}
+
+/* ====== END ROADMAP FEATURES ====== */
 
 /* ----------------------------------------------------------------
    INIT ALL
