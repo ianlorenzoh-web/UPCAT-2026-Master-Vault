@@ -1115,6 +1115,45 @@ function initScrollReveal() {
 }
 
 /* ----------------------------------------------------------------
+   TOTAL VISIT COUNTER — CountAPI (countapi.xyz)
+   Increments and displays a persistent all-time visit count.
+   Namespace is scoped to this vault so it won't collide with others.
+   Falls back silently if the API is unreachable.
+   ---------------------------------------------------------------- */
+const _COUNTAPI_KEY  = 'upcat-vault-2027-visits';
+const _COUNTAPI_NS   = 'upcat-master-vault';
+
+async function initTotalVisitCounter() {
+  const el = document.getElementById('total-visit-count');
+  if (!el) return;
+
+  // Check if this tab has already been counted this session
+  // to avoid inflating on every hot-reload / navigation within the SPA.
+  if (sessionStorage.getItem('upcat_visit_counted')) {
+    // Just fetch the current value without incrementing
+    try {
+      const res  = await fetch(`https://api.countapi.xyz/get/${_COUNTAPI_NS}/${_COUNTAPI_KEY}`);
+      const data = await res.json();
+      if (typeof data.value === 'number') el.textContent = data.value.toLocaleString();
+    } catch(e) {}
+    return;
+  }
+
+  try {
+    // hit/create increments the counter by 1 and returns the new value
+    const res  = await fetch(`https://api.countapi.xyz/hit/${_COUNTAPI_NS}/${_COUNTAPI_KEY}`);
+    const data = await res.json();
+    if (typeof data.value === 'number') {
+      el.textContent = data.value.toLocaleString();
+      sessionStorage.setItem('upcat_visit_counted', '1');
+    }
+  } catch(e) {
+    // API unreachable — show a dash rather than an error
+    el.textContent = '—';
+  }
+}
+
+/* ----------------------------------------------------------------
    LIVE VISITOR COUNTER — BroadcastChannel + localStorage
    Works across tabs in the same browser. Honest about its scope:
    this tracks open tabs, not unique internet users. No backend needed.
@@ -1242,5 +1281,6 @@ function initAll() {
   updatePomoDisplay();
   renderCustomTimers();
   initPresence();
+  initTotalVisitCounter();
   setTimeout(initScrollReveal, 300);
 }
