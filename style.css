@@ -119,13 +119,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Fix #2: Lock body scroll when mobile sidebar is open so background
-   content cannot scroll while the nav is visible */
-body.sidebar-open {
-  overflow: hidden;
-  /* On iOS, touch-action alone isn't enough — position:fixed would
-     jump the page, so overflow:hidden is the correct approach here */
-}
+/* Fix #2: Body scroll lock is now handled entirely in JS via position:fixed
+   (overflow:hidden on body is broken on iOS Safari — do not use it) */
 
 a { color: inherit; }
 button { cursor: pointer; font-family: inherit; }
@@ -215,14 +210,19 @@ input, select, textarea { font-family: inherit; }
   -webkit-backdrop-filter: blur(24px) saturate(1.8);
   border-right: 1px solid var(--glass-border);
   display: flex; flex-direction: column;
-  position: fixed; top: 0; left: 0; bottom: 0;
+  position: fixed; top: 0; left: 0;
+  /* Fix: Use 100dvh instead of bottom:0/100vh — dvh accounts for iOS
+     browser chrome (address bar) correctly so sidebar fills full screen */
+  height: 100dvh;
   z-index: 100; transition: transform var(--transition);
   overflow-y: auto; overflow-x: hidden;
-  /* Fix #1: Enable iOS momentum/native scrolling inside the sidebar */
+  /* Enable iOS momentum/native scrolling inside the sidebar */
   -webkit-overflow-scrolling: touch;
-  /* Fix #1: Prevent scroll events from propagating to the body */
+  /* Explicitly allow vertical pan so touch scroll works on Android + iOS */
+  touch-action: pan-y;
+  /* Prevent scroll events from propagating to the body */
   overscroll-behavior: contain;
-  /* Fix #3: Explicit stacking context so backdrop-filter compositing
+  /* Explicit stacking context so backdrop-filter compositing
      does not swallow pointer events on nav children */
   isolation: isolate;
   box-shadow: 4px 0 32px rgba(0,0,0,0.3);
@@ -895,7 +895,13 @@ input, select, textarea { font-family: inherit; }
    entire page from blurring — the sidebar has its own blur. */
 .overlay {
   display: none;
-  position: fixed; inset: 0;
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  /* Fix: start AFTER the sidebar so the overlay never covers it.
+     This prevents the overlay from intercepting touch events on the
+     sidebar on mobile browsers where backdrop-filter creates a
+     compositing layer that confuses touch hit-testing. */
+  left: var(--sidebar-w);
   background: rgba(0,0,0,0.55);
   z-index: 99;
   /* No backdrop-filter here — prevents full-page blur bug */
