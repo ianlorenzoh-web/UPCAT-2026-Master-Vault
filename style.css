@@ -69,6 +69,9 @@
   --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
   --transition-spring: 0.45s cubic-bezier(0.34,1.56,0.64,1);
   --transition-slow: 0.5s cubic-bezier(0.4,0,0.2,1);
+
+  /* Fix #8: Define --font-mono so all components resolve correctly */
+  --font-mono: 'JetBrains Mono', 'DM Mono', monospace;
 }
 
 [data-theme="light"] {
@@ -114,6 +117,14 @@ body {
   overflow-x: hidden;
   transition: background 0.4s, color 0.4s;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Fix #2: Lock body scroll when mobile sidebar is open so background
+   content cannot scroll while the nav is visible */
+body.sidebar-open {
+  overflow: hidden;
+  /* On iOS, touch-action alone isn't enough — position:fixed would
+     jump the page, so overflow:hidden is the correct approach here */
 }
 
 a { color: inherit; }
@@ -207,6 +218,13 @@ input, select, textarea { font-family: inherit; }
   position: fixed; top: 0; left: 0; bottom: 0;
   z-index: 100; transition: transform var(--transition);
   overflow-y: auto; overflow-x: hidden;
+  /* Fix #1: Enable iOS momentum/native scrolling inside the sidebar */
+  -webkit-overflow-scrolling: touch;
+  /* Fix #1: Prevent scroll events from propagating to the body */
+  overscroll-behavior: contain;
+  /* Fix #3: Explicit stacking context so backdrop-filter compositing
+     does not swallow pointer events on nav children */
+  isolation: isolate;
   box-shadow: 4px 0 32px rgba(0,0,0,0.3);
 }
 [data-theme="light"] .sidebar { background: rgba(248,249,255,0.93); box-shadow: 4px 0 24px rgba(0,0,0,0.08); }
@@ -251,6 +269,8 @@ input, select, textarea { font-family: inherit; }
   color: var(--text-secondary); font-size: 0.82rem; font-weight: 500;
   transition: all var(--transition); margin-bottom: 2px;
   border: 1px solid transparent; position: relative;
+  /* Fix #3: Eliminate the 300ms tap delay on mobile browsers */
+  touch-action: manipulation;
 }
 .nav-item i { width: 16px; text-align: center; font-size: 0.8rem; opacity: 0.8; }
 .nav-item:hover { background: var(--glass-hover); color: var(--text-primary); border-color: var(--glass-border); }
@@ -665,13 +685,25 @@ input, select, textarea { font-family: inherit; }
 /* ----------------------------------------------------------------
    POMODORO
    ---------------------------------------------------------------- */
-.pomo-wrap { display:flex; flex-direction:column; align-items:center; padding:28px; background:var(--bg-card); border:1px solid var(--glass-border); border-radius:var(--radius-xl); }
-.pomo-svg-wrap { position:relative; margin-bottom:16px; }
+/* Fix #5: Use row layout so the SVG ring and controls sit side-by-side */
+.pomo-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 28px;
+  padding: 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.pomo-svg-wrap { position:relative; margin-bottom:0; flex-shrink:0; }
 .pomo-track { fill:none; stroke:var(--glass-border); stroke-width:6; }
 .pomo-progress { fill:none; stroke:url(#pomoGrad); stroke-width:6; stroke-linecap:round; stroke-dasharray:408; stroke-dashoffset:0; transition:stroke-dashoffset 1s linear; }
-.pomo-display { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-family:'JetBrains Mono',monospace; font-size:1.6rem; font-weight:700; color:var(--text-primary); }
-.pomo-buttons { display:flex; gap:10px; }
-.pomo-btn { padding:9px 22px; border-radius:10px; border:none; font-family:inherit; font-weight:700; font-size:0.82rem; cursor:pointer; transition:all var(--transition); }
+.pomo-display { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-family:var(--font-mono); font-size:1.6rem; font-weight:700; color:var(--text-primary); }
+.pomo-buttons { display:flex; gap:10px; margin-top: 12px; }
+.pomo-btn { padding:9px 22px; border-radius:10px; border:none; font-family:inherit; font-weight:700; font-size:0.82rem; cursor:pointer; transition:all var(--transition); touch-action:manipulation; }
 .pomo-btn.start { background:linear-gradient(135deg,#6366f1,#7c7ff7); color:white; border:none; box-shadow:0 4px 16px var(--accent-glow); }
 .pomo-btn.start:hover { transform:translateY(-2px); box-shadow:0 8px 24px var(--accent-glow); }
 .pomo-btn.reset { background:var(--glass); border:1px solid var(--glass-border); color:var(--text-secondary); }
@@ -982,6 +1014,9 @@ input, select, textarea { font-family: inherit; }
   .hero-banner h2 { font-size:1.3rem; }
   .achievement-grid { grid-template-columns:repeat(2,1fr); }
   .campus-grid { grid-template-columns:1fr; }
+  /* Fix #5 responsive: stack pomo back to column on very small screens */
+  .pomo-wrap { flex-direction: column; align-items: center; }
+  .pomo-svg-wrap { margin-bottom: 12px; }
 }
 
 /* ----------------------------------------------------------------
@@ -1010,6 +1045,7 @@ input, select, textarea { font-family: inherit; }
   background: var(--accent-dim); border: 1px solid var(--accent-border);
   color: var(--accent-3); font-size: 0.76rem; font-weight: 700;
   cursor: pointer; transition: all var(--transition);
+  touch-action: manipulation;
 }
 .pomo-set-btn:hover { background: var(--accent); color: #fff; }
 .pomo-mode-label {
@@ -1061,7 +1097,7 @@ input, select, textarea { font-family: inherit; }
 .custom-timer-btn {
   padding: 5px 11px; border-radius: 7px; font-size: 0.74rem;
   font-weight: 700; cursor: pointer; border: 1px solid;
-  transition: all var(--transition);
+  transition: all var(--transition); touch-action: manipulation;
 }
 .ctb-start {
   background: var(--accent-dim); border-color: var(--accent-border);
@@ -1080,33 +1116,57 @@ input, select, textarea { font-family: inherit; }
 .ctb-delete:hover { background: var(--rose); color: #fff; }
 
 /* ----------------------------------------------------------------
-   CREDITS SECTION
+   CREDITS SECTION — Fix #6/#7: Two-photo gallery layout
    ---------------------------------------------------------------- */
 .credits-section {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   padding: 40px 20px; text-align: center;
-  min-height: 70vh;
+}
+
+/* Fix #6/#7: Responsive two-photo gallery */
+.credits-gallery {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
 }
 .credits-photo-frame {
-  position: relative; margin-bottom: 32px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 .credits-photo-glow {
   position: absolute; inset: -18px;
   background: radial-gradient(ellipse at 50% 50%, rgba(99,102,241,0.25) 0%, rgba(6,182,212,0.15) 50%, transparent 75%);
   border-radius: 50%; animation: creditsGlow 4s ease-in-out infinite alternate;
-  pointer-events: none;
+  pointer-events: none; z-index: 0;
 }
 @keyframes creditsGlow {
   0% { opacity: 0.5; transform: scale(0.95); }
   100% { opacity: 1; transform: scale(1.05); }
 }
 .credits-photo {
-  width: 280px; height: 340px; object-fit: cover;
-  border-radius: 22px;
+  width: 240px;
+  /* Let height be natural so tall/wide photos both look good */
+  height: auto;
+  max-height: 360px;
+  object-fit: cover;
+  border-radius: 18px;
   border: 2px solid var(--accent-border);
   box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
   display: block; position: relative; z-index: 1;
+  /* Fix #7: lazy load for performance */
+  loading: lazy;
+}
+.credits-photo-label {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-muted);
+  font-family: var(--font-mono); position: relative; z-index: 1;
 }
 .credits-caption {
   font-size: 1rem; font-style: italic;
@@ -1157,8 +1217,14 @@ input, select, textarea { font-family: inherit; }
   font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);
   letter-spacing: 0.08em; margin-top: 8px;
 }
-@media (max-width: 480px) {
-  .credits-photo { width: 220px; height: 270px; }
+@media (max-width: 600px) {
+  .credits-gallery { gap: 16px; }
+  .credits-photo { width: 160px; max-height: 260px; }
+}
+@media (max-width: 400px) {
+  /* Stack photos vertically on very small phones */
+  .credits-gallery { flex-direction: column; align-items: center; }
+  .credits-photo { width: 200px; max-height: 300px; }
   .credits-names-row { flex-direction: column; gap: 10px; }
   .credits-heart { display: none; }
 }
