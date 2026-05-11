@@ -104,12 +104,16 @@ function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const ov = document.getElementById('overlay');
   const isOpen = sb.classList.toggle('open');
-  // Show or hide overlay without any CSS filter/blur on the page
+  // Show/hide the dim overlay
   ov.style.display = isOpen ? 'block' : 'none';
+  // Fix #2: Lock body scroll when sidebar is open on mobile
+  document.body.classList.toggle('sidebar-open', isOpen);
 }
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('overlay').style.display = 'none';
+  // Fix #2: Always release body scroll lock when sidebar closes
+  document.body.classList.remove('sidebar-open');
 }
 
 /* ----------------------------------------------------------------
@@ -338,9 +342,15 @@ function renderTopics() {
       </div>
       <div class="subject-body">
         ${s.topics.map(t => {
-          const key = s.id+'::'+t;
-          const isDone = !!state.topics[key];
-          return `<div class="topic-item ${isDone?'done':''}" onclick="toggleTopic('${key}')">
+          /* Fix #4 & #9: Use a data attribute instead of injecting the raw key
+             string into an onclick="..." attribute. This is safe for ANY topic
+             name including those with apostrophes (Earth's Interior), quotes,
+             or any other special characters. */
+          const key     = s.id + '::' + t;
+          const isDone  = !!state.topics[key];
+          // Escape the key for safe placement in a data-* attribute value
+          const safeKey = key.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+          return `<div class="topic-item ${isDone?'done':''}" data-topic-key="${safeKey}">
             <div class="topic-check">${isDone?'✓':''}</div>
             <span class="topic-name">${t}</span>
           </div>`;
@@ -357,6 +367,20 @@ function toggleTopic(key) {
   saveState(); renderTopics(); updateDashboardStats();
   showToast(state.topics[key] ? '✅ Topic checked! +10 XP' : 'Topic unchecked.');
 }
+
+/* Fix #9: Single delegated click listener on the topics container.
+   Handles ALL topic items — no matter what characters are in the topic
+   name — by reading the key from the element's dataset instead of
+   evaluating an inline JS string. Attached once at DOMContentLoaded. */
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('topics-container');
+  if (container) {
+    container.addEventListener('click', e => {
+      const item = e.target.closest('.topic-item[data-topic-key]');
+      if (item) toggleTopic(item.dataset.topicKey);
+    });
+  }
+});
 
 /* ----------------------------------------------------------------
    STUDY PLANS
