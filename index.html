@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UPCAT 2026 Master Vault — Premium Study Hub</title>
+  <meta name="description" content="The ultimate free study hub for UPCAT 2026 aspirants. Reviewers, formulas, mock tests, study plans, and more." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ===================== LOADER ===================== -->
+<div class="loader" id="loader">
+  <div class="loader-logo"><span class="glow-text">UPCAT</span> Vault</div>
+  <div class="loader-sub">2026 Master Study Hub</div>
+  <div class="loader-progress-wrap">
+    <div class="loader-progress-track">
+      <div class="loader-progress-fill" id="loaderFill"></div>
+    </div>
+    <div class="loader-pct" id="loaderPct">0%</div>
+  </div>
+  <div class="loader-credit">Concept by Ian Lorenzo Herico</div>
+</div>
+
+<!-- ===================== BACKGROUNDS ===================== -->
+<div class="bg-grid"></div>
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+</div>
+
+<!-- ===================== OVERLAY (mobile) ===================== -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ===================== APP WRAPPER ===================== -->
+<div class="app">
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><i class="fas fa-bolt"></i></div>
+      <div class="sidebar-logo-text"><span class="hl">UPCAT 2026</span><br>Master Vault</div>
+      <div class="sidebar-badge">Free · Open Access</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">Overview</div>
+      <div class="nav-item active" onclick="showSection('dashboard',this)">
+        <i class="fas fa-house"></i> Dashboard
+      </div>
+
+      <div class="nav-group-label">Study Materials</div>
+      <div class="nav-item" onclick="showSection('reviewers',this)">
+        <i class="fas fa-book-open"></i> Full Reviewers
+        <span class="nav-badge">4</span>
+      </div>
+      <div class="nav-item" onclick="showSection('topics',this)">
+        <i class="fas fa-list-check"></i> Subject Topics
+      </div>
+      <div class="nav-item" onclick="showSection('formulas',this)">
+        <i class="fas fa-square-root-variable"></i> Formula Sheet
+      </div>
+
+      <div class="nav-group-label">Planning</div>
+      <div class="nav-item" onclick="showSection('plans',this)">
+        <i class="fas fa-calendar-days"></i> Study Plans
+      </div>
+      <div class="nav-item" onclick="showSection('tasks',this)">
+        <i class="fas fa-clipboard-check"></i> Task Tracker
+      </div>
+
+      <div class="nav-group-label">Testing</div>
+      <div class="nav-item" onclick="showSection('mocks',this)">
+        <i class="fas fa-file-pen"></i> Mock Tests
+      </div>
+      <div class="nav-item" onclick="showSection('mocks',this)" style="margin-left:4px;font-size:0.78rem;padding:8px 12px;">
+        <i class="fas fa-flask" style="opacity:0.6;"></i> Simulations
+      </div>
+
+      <div class="nav-group-label">Resources</div>
+      <div class="nav-item" onclick="showSection('tips',this)">
+        <i class="fas fa-lightbulb"></i> Exam Tips
+      </div>
+      <div class="nav-item" onclick="showSection('official',this)">
+        <i class="fas fa-link"></i> Official Resources
+      </div>
+      <div class="nav-item" onclick="showSection('achievements',this)">
+        <i class="fas fa-trophy"></i> Achievements
+      </div>
+
+      <div class="nav-group-label">Tools</div>
+      <div class="nav-item nav-upg" onclick="showSection('upg',this)">
+        <i class="fas fa-calculator"></i> UPG Calculator
+      </div>
+      <div class="nav-item nav-guide" onclick="showSection('guide',this)">
+        <i class="fas fa-map-signs"></i> UPCAT Guide
+      </div>
+      <div class="nav-item" onclick="showSection('settings',this)">
+        <i class="fas fa-gear"></i> Settings
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      Free for all UPCAT aspirants<br>
+      Made with ❤️ by <span class="credit-name">Ian Lorenzo Herico</span><br>
+      UPCAT 2026 · All rights reserved
+    </div>
+  </aside>
+
+  <!-- ==================== MAIN ==================== -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="topbar-btn hamburger" onclick="toggleSidebar()" aria-label="Menu">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="search-bar">
+        <i class="fas fa-magnifying-glass"></i>
+        <input type="text" id="globalSearch" placeholder="Search formulas…" oninput="handleSearch(this.value)" />
+      </div>
+      <button class="topbar-upg-btn" onclick="showSection('upg')">
+        <i class="fas fa-calculator"></i> <span class="btn-text">UPG Calc</span>
+      </button>
+      <button class="topbar-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+      </button>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- ============ DASHBOARD ============ -->
+      <section class="section active" id="sec-dashboard">
+        <!-- Hero Banner -->
+        <div class="hero-banner fade-up">
+          <div class="hero-eyebrow">UPCAT 2026 · Study Hub</div>
+          <h2>Your <span class="gradient-text">All-in-One</span><br>UPCAT Preparation Platform</h2>
+          <p>Free reviewers, formula sheets, mock tests, study plans, and progress tracking — everything you need to pass the UPCAT, in one place.</p>
+          <div class="hero-cta">
+            <button class="btn btn-primary" onclick="showSection('reviewers')">
+              <i class="fas fa-book-open"></i> Browse Reviewers
+            </button>
+            <button class="btn btn-cyan" onclick="showSection('mocks')">
+              <i class="fas fa-file-pen"></i> Take Mock Test
+            </button>
+            <button class="btn btn-secondary" onclick="showSection('guide')">
+              <i class="fas fa-map-signs"></i> UPCAT Guide
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid-4 mb-24 fade-up">
+          <div class="stat-card s-indigo">
+            <div class="stat-icon si-indigo"><i class="fas fa-book"></i></div>
+            <div class="stat-value" id="stat-pdfs">0</div>
+            <div class="stat-label">Reviewers Done</div>
+          </div>
+          <div class="stat-card s-cyan">
+            <div class="stat-icon si-cyan"><i class="fas fa-file-pen"></i></div>
+            <div class="stat-value" id="stat-mocks">0</div>
+            <div class="stat-label">Mock Tests Done</div>
+          </div>
+          <div class="stat-card s-emerald">
+            <div class="stat-icon si-emerald"><i class="fas fa-list-check"></i></div>
+            <div class="stat-value" id="stat-topics">0</div>
+            <div class="stat-label">Topics Covered</div>
+          </div>
+          <div class="stat-card s-amber">
+            <div class="stat-icon si-amber"><i class="fas fa-fire"></i></div>
+            <div class="stat-value" id="stat-streak">0</div>
+            <div class="stat-label">Day Streak 🔥</div>
+          </div>
+        </div>
+
+        <!-- Countdown + Quote -->
+        <div class="countdown-wrap mb-24 fade-up">
+          <div>
+            <div class="countdown-label"><i class="fas fa-clock" style="margin-right:6px;"></i>Days Until UPCAT 2026</div>
+            <div class="countdown-units">
+              <div class="countdown-unit">
+                <div class="countdown-num" id="cd-days">--</div>
+                <span>Days</span>
+              </div>
+              <div class="countdown-sep">:</div>
+              <div class="countdown-unit">
+                <div class="countdown-num" id="cd-hrs">--</div>
+                <span>Hours</span>
+              </div>
+              <div class="countdown-sep">:</div>
+              <div class="countdown-unit">
+                <div class="countdown-num" id="cd-min">--</div>
+                <span>Mins</span>
+              </div>
+              <div class="countdown-sep">:</div>
+              <div class="countdown-unit">
+                <div class="countdown-num" id="cd-sec">--</div>
+                <span>Secs</span>
+              </div>
+            </div>
+          </div>
+          <div class="quote-wrap">
+            <div class="quote-text" id="quote-text">"Loading your daily motivation…"</div>
+            <div class="quote-author" id="quote-author">— UPCAT 2026 Vault</div>
+          </div>
+        </div>
+
+        <!-- XP Bar + Progress -->
+        <div class="grid-2 mb-24">
+          <div class="xp-bar-wrap fade-up">
+            <div class="xp-top">
+              <div class="xp-level-badge">
+                <div class="xp-level-label">LVL</div>
+                <div class="xp-level-num" id="xp-level">1</div>
+              </div>
+              <div class="xp-info">
+                <div class="xp-title" id="xp-rank">Freshman Scholar</div>
+                <div class="xp-sub" id="xp-sub">0 / 100 XP to next level</div>
+              </div>
+              <div style="font-size:0.8rem;color:var(--accent-3);font-weight:700;" id="xp-total">0 XP</div>
+            </div>
+            <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+          </div>
+
+          <div class="progress-panel fade-up">
+            <div class="progress-panel-header">
+              <div>
+                <div style="font-size:0.72rem;color:var(--text-muted);font-weight:700;letter-spacing:0.1em;margin-bottom:4px;">OVERALL PROGRESS</div>
+                <div class="overall-pct" id="overall-pct">0%</div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="showSection('topics')">View Topics</button>
+            </div>
+            <div class="progress-track mb-24" style="margin-bottom:18px;">
+              <div class="progress-fill" id="overall-bar" style="width:0%"></div>
+            </div>
+            <div class="subject-bars">
+              <div><div class="progress-label"><span>Mathematics</span><span id="pct-math">0%</span></div><div class="progress-track"><div class="progress-fill" id="bar-math" style="width:0%;background:linear-gradient(90deg,#6366f1,#818cf8)"></div></div></div>
+              <div><div class="progress-label"><span>Science</span><span id="pct-sci">0%</span></div><div class="progress-track"><div class="progress-fill" id="bar-sci" style="width:0%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div></div>
+              <div><div class="progress-label"><span>Filipino</span><span id="pct-fil">0%</span></div><div class="progress-track"><div class="progress-fill" id="bar-fil" style="width:0%;background:linear-gradient(90deg,#f43f5e,#fb7185)"></div></div></div>
+              <div><div class="progress-label"><span>English / RC</span><span id="pct-eng">0%</span></div><div class="progress-track"><div class="progress-fill" id="bar-eng" style="width:0%;background:linear-gradient(90deg,#818cf8,#a5b4fc)"></div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Access -->
+        <div style="margin-bottom:10px;font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;" class="fade-up">Quick Access</div>
+        <div class="quick-grid mb-24 fade-up">
+          <div class="quick-card" onclick="showSection('reviewers')">
+            <div class="quick-icon">📚</div>
+            <div class="quick-title">Reviewers</div>
+            <div class="quick-sub">4 free PDFs</div>
+          </div>
+          <div class="quick-card" onclick="showSection('formulas')">
+            <div class="quick-icon">📐</div>
+            <div class="quick-title">Formulas</div>
+            <div class="quick-sub">50+ equations</div>
+          </div>
+          <div class="quick-card" onclick="showSection('mocks')">
+            <div class="quick-icon">📝</div>
+            <div class="quick-title">Mock Tests</div>
+            <div class="quick-sub">4 full tests</div>
+          </div>
+          <div class="quick-card" onclick="showSection('topics')">
+            <div class="quick-icon">🧬</div>
+            <div class="quick-title">Topics</div>
+            <div class="quick-sub">8 subjects</div>
+          </div>
+          <div class="quick-card" onclick="showSection('plans')">
+            <div class="quick-icon">🗓️</div>
+            <div class="quick-title">Study Plans</div>
+            <div class="quick-sub">1–3 month plans</div>
+          </div>
+          <div class="quick-card" onclick="showSection('tips')">
+            <div class="quick-icon">💡</div>
+            <div class="quick-title">Exam Tips</div>
+            <div class="quick-sub">10 pro strategies</div>
+          </div>
+        </div>
+
+        <!-- Pomodoro Timer -->
+        <div class="mb-24 fade-up">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;">Focus Timer (Pomodoro)</div>
+          <div class="pomo-wrap">
+            <div class="pomo-svg-wrap">
+              <svg width="140" height="140" viewBox="0 0 140 140">
+                <defs>
+                  <linearGradient id="pomoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#6366f1"/>
+                    <stop offset="100%" stop-color="#06b6d4"/>
+                  </linearGradient>
+                </defs>
+                <circle class="pomo-track" cx="70" cy="70" r="65"/>
+                <circle class="pomo-progress" id="pomo-circle" cx="70" cy="70" r="65" transform="rotate(-90 70 70)"/>
+              </svg>
+              <div class="pomo-display" id="pomo-display">25:00</div>
+            </div>
+            <div class="pomo-buttons">
+              <button class="pomo-btn start" id="pomo-start" onclick="togglePomo()">Start</button>
+              <button class="pomo-btn reset" onclick="resetPomo()">Reset</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ REVIEWERS ============ -->
+      <section class="section" id="sec-reviewers">
+        <div class="section-header">
+          <h1>📚 Full Reviewers</h1>
+          <p>Free UPCAT reviewers covering all four subtests. View directly or open in Google Drive. Mark complete to earn XP.</p>
+        </div>
+        <div class="grid-2" id="reviewer-grid"></div>
+      </section>
+
+      <!-- ============ TOPICS ============ -->
+      <section class="section" id="sec-topics">
+        <div class="section-header">
+          <h1>🧬 Subject Topics</h1>
+          <p>Track your topic coverage across all 8 UPCAT subjects. Click to mark topics complete and earn +10 XP each.</p>
+        </div>
+        <div id="topics-container"></div>
+      </section>
+
+      <!-- ============ STUDY PLANS ============ -->
+      <section class="section" id="sec-plans">
+        <div class="section-header">
+          <h1>🗓️ Study Plans</h1>
+          <p>Choose a study plan that fits your timeline. Activate one to earn +25 XP and keep yourself accountable.</p>
+        </div>
+        <div class="grid-3" id="plans-container"></div>
+      </section>
+
+      <!-- ============ FORMULA SHEET ============ -->
+      <section class="section" id="sec-formulas">
+        <div class="section-header">
+          <h1>📐 Formula Sheet</h1>
+          <p>50+ essential formulas for Math, Physics, Chemistry, and Statistics. Bookmark your favorites or copy with one click.</p>
+        </div>
+        <div class="formula-filters" id="formula-filters"></div>
+        <div class="grid-3" id="formula-grid"></div>
+      </section>
+
+      <!-- ============ TASK TRACKER ============ -->
+      <section class="section" id="sec-tasks">
+        <div class="section-header">
+          <h1>✅ Task Tracker</h1>
+          <p>Add study tasks, set priorities, and track your daily progress. Completing tasks earns +15 XP each.</p>
+        </div>
+        <div class="card mb-24 fade-up">
+          <div class="task-add-row">
+            <input type="text" class="task-input" id="taskInput" placeholder="Add a study task… (e.g. Review Algebra Chapter 3)" onkeydown="if(event.key==='Enter')addTask()" />
+            <select class="task-select" id="taskPriority">
+              <option value="high">🔴 High Priority</option>
+              <option value="med" selected>🟡 Medium Priority</option>
+              <option value="low">🟢 Low Priority</option>
+            </select>
+            <button class="btn btn-primary" onclick="addTask()">
+              <i class="fas fa-plus"></i> Add Task
+            </button>
+          </div>
+          <div id="task-list"></div>
+        </div>
+      </section>
+
+      <!-- ============ EXAM TIPS ============ -->
+      <section class="section" id="sec-tips">
+        <div class="section-header">
+          <h1>💡 Exam Tips</h1>
+          <p>10 expert strategies to maximize your UPCAT score. Master these and go into exam day with confidence.</p>
+        </div>
+        <div class="grid-2" id="tips-container"></div>
+      </section>
+
+      <!-- ============ ACHIEVEMENTS ============ -->
+      <section class="section" id="sec-achievements">
+        <div class="section-header">
+          <h1>🏆 Achievements</h1>
+          <p>Earn badges by completing reviewers, topics, mock tests, and more. How many can you unlock?</p>
+        </div>
+        <div class="achievement-grid" id="achievement-grid"></div>
+      </section>
+
+      <!-- ============ OFFICIAL RESOURCES ============ -->
+      <section class="section" id="sec-official">
+        <div class="section-header">
+          <h1>🔗 Official Resources</h1>
+          <p>Direct links to official UP Diliman sources, UPCAT announcements, and trusted study platforms.</p>
+        </div>
+        <div class="resource-grid fade-up">
+          <div class="resource-card">
+            <div class="resource-icon" style="background:var(--maroon-dim);color:#f87171;">🏛️</div>
+            <div>
+              <div class="resource-title">UP Office of Admissions</div>
+              <div class="resource-desc">Official admission announcements, UPCAT schedules, and application updates from UP Diliman.</div>
+              <a href="https://www.up.edu.ph/admission/" target="_blank" class="btn btn-secondary btn-sm"><i class="fas fa-external-link-alt"></i> Visit Site</a>
+            </div>
+          </div>
+          <div class="resource-card">
+            <div class="resource-icon" style="background:var(--cyan-dim);color:var(--cyan-bright);">📋</div>
+            <div>
+              <div class="resource-title">UPCAT Application Portal</div>
+              <div class="resource-desc">Online application system for UPCAT 2026. Check deadlines and submission requirements.</div>
+              <a href="https://upcat.up.edu.ph/" target="_blank" class="btn btn-secondary btn-sm"><i class="fas fa-external-link-alt"></i> Apply Now</a>
+            </div>
+          </div>
+          <div class="resource-card">
+            <div class="resource-icon" style="background:var(--emerald-dim);color:var(--emerald-bright);">📖</div>
+            <div>
+              <div class="resource-title">Khan Academy (Free)</div>
+              <div class="resource-desc">Free world-class Math and Science practice aligned with UPCAT topics. Highly recommended for drilling.</div>
+              <a href="https://www.khanacademy.org/" target="_blank" class="btn btn-secondary btn-sm"><i class="fas fa-external-link-alt"></i> Practice</a>
+            </div>
+          </div>
+          <div class="resource-card">
+            <div class="resource-icon" style="background:var(--accent-dim);color:var(--accent-3);">🎥</div>
+            <div>
+              <div class="resource-title">Sir Mamerto Math (YouTube)</div>
+              <div class="resource-desc">Top Filipino math reviewer channel. Excellent for UPCAT Math tips, shortcuts, and walkthroughs.</div>
+              <a href="https://www.youtube.com/@SirMamerto" target="_blank" class="btn btn-secondary btn-sm"><i class="fas fa-external-link-alt"></i> Watch</a>
+            </div>
+          </div>
+          <div class="resource-card">
+            <div class="resource-icon" style="background:var(--amber-dim);color:var(--amber-bright);">📰</div>
+            <div>
+              <div class="resource-title">Philippine Science (DepEd)</div>
+              <div class="resource-desc">Official DepEd K-12 learning resources and SHS modules covering UPCAT Science content.</div>
+              <a href="https://lrmds.deped.gov.ph/" target="_blank" class="btn btn-secondary btn-sm"><i class="fas fa-external-link-alt"></i> Browse</a>
+            </div>
+          </div>
+          <div class="resource-card">
+            <div class="resource-icon" style="background:var(--purple-dim);color:var(--purple-bright);">🧪</div>
+            <div>
+              <div class="resource-title">Quizlet — UPCAT Flashcards</div>
+              <div class="resource-desc">Community-made UPCAT flashcard sets for vocabulary, formulas, and key concepts. Great for active recall.</div>
+              <a href="https://quizlet.com/search?query=upcat&type=sets" target="_blank" class="btn btn-secondary btn-sm"><i class="fas fa-external-link-alt"></i> Study</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ MOCK TESTS & SIMULATIONS ============ -->
+      <section class="section" id="sec-mocks">
+        <div class="section-header">
+          <h1>📝 Mock Tests & Simulations</h1>
+          <p>Download or preview full mock exams. Simulate real UPCAT conditions and track your readiness.</p>
+        </div>
+
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;">— Mock Tests (Track Completion)</div>
+        <div class="grid-4 mb-32" id="mock-grid"></div>
+
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;">— Full Simulations (Preview & Download)</div>
+        <div class="grid-2" id="simulation-grid"></div>
+      </section>
+
+      <!-- ============ UPG CALCULATOR (Google Sheets Embed) ============ -->
+      <section class="section" id="sec-upg">
+        <div class="section-header">
+          <h1>🧮 UPG Calculator</h1>
+          <p>Use the interactive UPG Calculator below — built in Google Sheets so you can input and compute your estimated University Predicted Grade directly.</p>
+        </div>
+
+        <!-- Notice Banner -->
+        <div class="upg-notice-banner fade-up">
+          <div class="upg-notice-icon">📊</div>
+          <div class="upg-notice-content">
+            <div class="upg-notice-title">Google Sheets UPG Calculator</div>
+            <div class="upg-notice-desc">This is an interactive Google Sheets calculator embedded directly on this page. You can type your scores directly into the sheet. The calculator is a community estimate — the official UPG formula is not publicly disclosed by UP. <strong>Use for self-assessment only.</strong></div>
+          </div>
+          <a href="https://docs.google.com/spreadsheets/d/1APP1RizdXhwykcPxyhXs7Pskhp4jO94nGG0dVLYl-vI/edit?usp=drivesdk" target="_blank" class="btn btn-purple btn-sm upg-open-btn">
+            <i class="fas fa-external-link-alt"></i> Open Full Screen
+          </a>
+        </div>
+
+        <!-- Embedded Google Sheets Calculator -->
+        <div class="upg-embed-wrap fade-up">
+          <div class="upg-embed-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="upg-embed-dot dot-red"></div>
+              <div class="upg-embed-dot dot-amber"></div>
+              <div class="upg-embed-dot dot-green"></div>
+              <span class="upg-embed-label">UPG Calculator — Google Sheets</span>
+            </div>
+            <a href="https://docs.google.com/spreadsheets/d/1APP1RizdXhwykcPxyhXs7Pskhp4jO94nGG0dVLYl-vI/edit?usp=drivesdk" target="_blank" class="btn btn-secondary btn-sm">
+              <i class="fas fa-expand"></i> Fullscreen
+            </a>
+          </div>
+          <div class="upg-iframe-container">
+            <iframe
+              src="https://docs.google.com/spreadsheets/d/1APP1RizdXhwykcPxyhXs7Pskhp4jO94nGG0dVLYl-vI/edit?usp=sharing&rm=minimal&embedded=true"
+              class="upg-iframe"
+              title="UPG Calculator - Google Sheets"
+              frameborder="0"
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+            <div class="upg-iframe-fallback" id="upgFallback" style="display:none;">
+              <div style="text-align:center;padding:40px;">
+                <div style="font-size:2.5rem;margin-bottom:16px;">📊</div>
+                <div style="font-weight:800;font-size:1rem;margin-bottom:8px;">Can't display the embedded sheet?</div>
+                <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:20px;line-height:1.7;">Some browsers block embedded Google Sheets. Use the button below to open the calculator directly in Google Sheets — you can still input your scores there.</div>
+                <a href="https://docs.google.com/spreadsheets/d/1APP1RizdXhwykcPxyhXs7Pskhp4jO94nGG0dVLYl-vI/edit?usp=drivesdk" target="_blank" class="btn btn-purple">
+                  <i class="fas fa-external-link-alt"></i> Open Calculator in Google Sheets
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card fade-up" style="max-width:680px;margin-top:20px;">
+          <div style="font-size:0.85rem;font-weight:800;margin-bottom:14px;font-family:var(--font-display);">📋 How to Use the UPG Calculator</div>
+          <ul class="guide-list">
+            <li><strong>Step 1:</strong> The Google Sheets calculator is embedded above. Click on the cells to enter your scores.</li>
+            <li><strong>Step 2:</strong> Input your UPCAT Percentile Rank (0–100) in the designated cell.</li>
+            <li><strong>Step 3:</strong> Input your High School Grade average in the correct field.</li>
+            <li><strong>Step 4:</strong> The sheet will automatically compute your estimated UPG.</li>
+            <li><strong>Step 5:</strong> If the embed doesn't load, click "Open Full Screen" to use it directly in Google Sheets.</li>
+          </ul>
+        </div>
+
+        <!-- UPG Cutoffs Reference -->
+        <div class="card fade-up" style="max-width:680px;margin-top:16px;">
+          <div style="font-size:0.85rem;font-weight:800;margin-bottom:14px;font-family:var(--font-display);">📊 Typical UPG Cutoffs (Community Estimates)</div>
+          <div class="grid-2" style="gap:10px;">
+            <div style="padding:12px;background:var(--bg-elevated);border-radius:10px;border:1px solid var(--glass-border);">
+              <div style="font-size:0.7rem;font-weight:700;color:var(--text-muted);margin-bottom:4px;">Medicine / Law / Engineering</div>
+              <div style="font-weight:800;color:var(--rose);font-family:var(--font-mono);">&lt; 2.00 UPG</div>
+            </div>
+            <div style="padding:12px;background:var(--bg-elevated);border-radius:10px;border:1px solid var(--glass-border);">
+              <div style="font-size:0.7rem;font-weight:700;color:var(--text-muted);margin-bottom:4px;">Business / Social Sciences</div>
+              <div style="font-weight:800;color:var(--amber-bright);font-family:var(--font-mono);">&lt; 2.80 UPG</div>
+            </div>
+            <div style="padding:12px;background:var(--bg-elevated);border-radius:10px;border:1px solid var(--glass-border);">
+              <div style="font-size:0.7rem;font-weight:700;color:var(--text-muted);margin-bottom:4px;">Sciences / Education</div>
+              <div style="font-weight:800;color:var(--emerald-bright);font-family:var(--font-mono);">&lt; 3.20 UPG</div>
+            </div>
+            <div style="padding:12px;background:var(--bg-elevated);border-radius:10px;border:1px solid var(--glass-border);">
+              <div style="font-size:0.7rem;font-weight:700;color:var(--text-muted);margin-bottom:4px;">Other Programs</div>
+              <div style="font-weight:800;color:var(--cyan-bright);font-family:var(--font-mono);">&lt; 3.50+ UPG</div>
+            </div>
+          </div>
+          <div style="font-size:0.7rem;color:var(--text-muted);margin-top:12px;line-height:1.6;">Note: Cutoffs vary widely by campus and year. These are unofficial community estimates. Always refer to the official UP Admissions website for accurate information.</div>
+        </div>
+      </section>
+
+      <!-- ============ UPCAT PROCESS GUIDE (Expanded & Accurate) ============ -->
+      <section class="section" id="sec-guide">
+        <div class="section-header">
+          <h1>🗺️ UPCAT Process Guide</h1>
+          <p>Complete, step-by-step guide to the UPCAT — from eligibility to results. Your roadmap to becoming an Isko or Iska.</p>
+        </div>
+
+        <!-- Hero Banner -->
+        <div class="guide-hero fade-up">
+          <div style="position:relative;z-index:1;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+              <span style="font-size:2rem;">🏛️</span>
+              <div>
+                <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;letter-spacing:-0.5px;">University of the Philippines</div>
+                <div style="font-size:0.78rem;color:var(--text-secondary);">College Admission Test (UPCAT)</div>
+              </div>
+            </div>
+            <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.75;max-width:580px;">The UPCAT is the college admission test for all UP System campuses. It tests Language Proficiency, Reading Comprehension, Mathematics, and Science. Your score combines with your High School GWA to produce your <strong style="color:var(--accent-3);">University Predicted Grade (UPG)</strong> — the lower, the better.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+              <div style="font-size:0.72rem;padding:5px 12px;border-radius:99px;background:var(--accent-dim);color:var(--accent-3);border:1px solid var(--accent-border);font-weight:700;"><i class="fas fa-users" style="margin-right:5px;"></i>~100,000+ takers/year</div>
+              <div style="font-size:0.72rem;padding:5px 12px;border-radius:99px;background:var(--emerald-dim);color:var(--emerald-bright);border:1px solid rgba(16,185,129,0.25);font-weight:700;"><i class="fas fa-percentage" style="margin-right:5px;"></i>~14% passing rate</div>
+              <div style="font-size:0.72rem;padding:5px 12px;border-radius:99px;background:var(--amber-dim);color:var(--amber-bright);border:1px solid rgba(245,158,11,0.25);font-weight:700;"><i class="fas fa-clock" style="margin-right:5px;"></i>4 subtests · ~5 hours</div>
+              <div style="font-size:0.72rem;padding:5px 12px;border-radius:99px;background:var(--rose-dim);color:var(--rose);border:1px solid rgba(244,63,94,0.25);font-weight:700;"><i class="fas fa-calendar" style="margin-right:5px;"></i>Held annually (Aug–Oct)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 1: HOW TO APPLY ===== -->
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;font-family:var(--font-mono);">— Step-by-Step Application Process</div>
+        <div class="guide-steps fade-up">
+          <div class="guide-step-card">
+            <div class="guide-step-num" style="background:var(--accent-dim);color:var(--accent-3);">01</div>
+            <div class="guide-step-title">Check Eligibility</div>
+            <div class="guide-step-desc">You must be a current Grade 12 (SHS) student who will graduate in the same school year as the application period, OR a graduate from the previous year (within the allowed window). You can only take the UPCAT once in your lifetime — there are no retakes.</div>
+          </div>
+          <div class="guide-step-card">
+            <div class="guide-step-num" style="background:var(--cyan-dim);color:var(--cyan-bright);">02</div>
+            <div class="guide-step-title">Create an Online Account</div>
+            <div class="guide-step-desc">Go to the official UPCAT Online Application System (OAS) at upcat.up.edu.ph. Create your account using a valid email address you actively use. Take note of your username and password — you'll need this to retrieve your test permit later.</div>
+          </div>
+          <div class="guide-step-card">
+            <div class="guide-step-num" style="background:var(--emerald-dim);color:var(--emerald-bright);">03</div>
+            <div class="guide-step-title">Fill Out the Application Form</div>
+            <div class="guide-step-desc">Log in and complete your online application. Provide accurate personal information, high school details, GWA (Grade 11 and first sem Grade 12), and your campus and course choices. You may select up to 3 campus-degree program combinations, ranked by preference.</div>
+          </div>
+          <div class="guide-step-card">
+            <div class="guide-step-num" style="background:var(--amber-dim);color:var(--amber-bright);">04</div>
+            <div class="guide-step-title">Upload Required Documents</div>
+            <div class="guide-step-desc">Prepare and upload: (1) Recent ID photo (white background, formal attire), (2) Grade 11 Report Card / Form 138, and (3) Certificate of Enrollment for current Grade 12. Graduates must submit their Form 137-A. Ensure photos are clear and properly sized.</div>
+          </div>
+          <div class="guide-step-card">
+            <div class="guide-step-num" style="background:var(--rose-dim);color:var(--rose);">05</div>
+            <div class="guide-step-title">Pay the Application Fee</div>
+            <div class="guide-step-desc">Pay the application fee (typically ₱350–₱500 — check the official site for the current rate) at authorized payment centers or via online payment options listed in the OAS. Low-income applicants may qualify for a fee waiver by submitting a Notice of Assessment (NOA) from DSWD or CHED.</div>
+          </div>
+          <div class="guide-step-card">
+            <div class="guide-step-num" style="background:var(--purple-dim);color:var(--purple-bright);">06</div>
+            <div class="guide-step-title">Submit & Await Confirmation</div>
+            <div class="guide-step-desc">Review your entire application before final submission. Once submitted, you cannot edit most fields. Wait for your confirmation email from the OAS. Keep watch for any notices about incomplete or rejected applications during the verification period.</div>
+          </div>
+          <div class="guide-step-card">
+            <div class="guide-step-num" style="background:var(--amber-dim);color:var(--amber-bright);">07</div>
+            <div class="guide-step-title">Download Your Test Permit</div>
+            <div class="guide-step-desc">Once your application is approved and verified, log back into the OAS to download your UPCAT Test Permit. Print it on white bond paper — do not resize. The test permit contains your assigned test center, building, room number, and exam schedule. Bring this on exam day — no permit means no entry.</div>
+          </div>
+          <div class="guide-step-card">
+            <div class="guide-step-num" style="background:var(--emerald-dim);color:var(--emerald-bright);">08</div>
+            <div class="guide-step-title">Take the UPCAT</div>
+            <div class="guide-step-desc">Arrive at your test center at least 30 minutes early. Bring your printed test permit, at least 2 valid IDs, #2 or HB pencils, a black ballpen, and an eraser. No calculators, phones, smartwatches, or electronic devices allowed. Listen carefully to the proctor's instructions before starting.</div>
+          </div>
+          <div class="guide-step-card">
+            <div class="guide-step-num" style="background:var(--accent-dim);color:var(--accent-3);">09</div>
+            <div class="guide-step-title">Wait for Results</div>
+            <div class="guide-step-desc">UPCAT results are typically released 4–6 months after the exam (usually January–April of the following year). Results are announced on the official UP Admissions website and individual campus websites. Check regularly and use your OAS login credentials to view your results. Passers will receive instructions for enrollment.</div>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 2: QUALIFICATION REQUIREMENTS ===== -->
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;font-family:var(--font-mono);">— Eligibility & Qualification Requirements</div>
+        <div class="guide-accordion fade-up">
+          <div class="guide-acc-header" onclick="toggleGuideAcc(this)">
+            <div class="guide-acc-icon" style="background:var(--accent-dim);color:var(--accent-3);">🎓</div>
+            <div class="guide-acc-title">Who Can Apply for UPCAT?</div>
+            <i class="fas fa-chevron-down guide-acc-chevron"></i>
+          </div>
+          <div class="guide-acc-body">
+            <ul class="guide-list">
+              <li><strong>Current Grade 12 students</strong> graduating in the school year that the UPCAT is offered (SHS track: Academic, TVL, Sports, or Arts & Design).</li>
+              <li><strong>Recent SHS graduates</strong> who completed Grade 12 in the immediately preceding school year — subject to specific UP guidelines each year.</li>
+              <li>Applicants must <strong>not have previously taken the UPCAT</strong> — you only get one chance.</li>
+              <li>Applicants must meet the <strong>minimum GWA requirement</strong> set by UP (typically at least 83 or 84 average in core subjects — verify with the current application bulletin).</li>
+              <li><strong>ALS passers</strong> who meet the equivalent academic requirements may also be eligible — check the official announcement each cycle.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="guide-accordion fade-up">
+          <div class="guide-acc-header" onclick="toggleGuideAcc(this)">
+            <div class="guide-acc-icon" style="background:var(--cyan-dim);color:var(--cyan-bright);">📄</div>
+            <div class="guide-acc-title">Documents Required for Application</div>
+            <i class="fas fa-chevron-down guide-acc-chevron"></i>
+          </div>
+          <div class="guide-acc-body">
+            <ul class="guide-list">
+              <li><strong>ID Photo:</strong> Recent 1x1 or 2x2 photo on white background, formal attire, with name tag. Digital upload required.</li>
+              <li><strong>Grade 11 Report Card (Form 138):</strong> Shows your cumulative grades from Grade 11. This is used to compute your initial GWA for the application.</li>
+              <li><strong>Grade 12 First Semester Report Card:</strong> Required once available, showing your Grade 12 sem 1 grades.</li>
+              <li><strong>Certificate of Enrollment:</strong> Proves you are currently enrolled in Grade 12 during the application period.</li>
+              <li><strong>For fee waiver applicants:</strong> Notice of Assessment (NOA) from DSWD or proof of CHED scholarship / indigency. Check the current OAS for specific requirements.</li>
+              <li><strong>For graduates:</strong> Form 137-A (Permanent Record) may be required. Check the bulletin for your specific cycle.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 3: CAMPUS & COURSE CHOICES ===== -->
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;font-family:var(--font-mono);">— Choosing Your Campus & Degree Program</div>
+        <div class="guide-accordion fade-up">
+          <div class="guide-acc-header" onclick="toggleGuideAcc(this)">
+            <div class="guide-acc-icon" style="background:var(--emerald-dim);color:var(--emerald-bright);">🏫</div>
+            <div class="guide-acc-title">Quota vs Non-Quota Programs — What's the Difference?</div>
+            <i class="fas fa-chevron-down guide-acc-chevron"></i>
+          </div>
+          <div class="guide-acc-body">
+            <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.75;margin-bottom:14px;"><strong style="color:var(--text-primary);">Quota programs</strong> have a fixed number of available slots per campus. Admission is purely competitive — only the applicants with the lowest UPG within the quota are admitted. Even a passing UPG may not be enough if the quota is already filled by students with lower UPGs.</p>
+            <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.75;margin-bottom:14px;"><strong style="color:var(--text-primary);">Non-quota programs</strong> admit all applicants who pass — there is no slot limit. Any applicant who achieves a UPG at or below the program's passing threshold is admitted.</p>
+            <ul class="guide-list">
+              <li><strong>Quota programs</strong> include: Medicine (pre-med), Engineering, Architecture, Fine Arts, Nursing, Physical Therapy, and several other competitive courses. Check the current bulletin for the official list.</li>
+              <li><strong>Non-quota programs</strong> include: Education, Social Sciences, Humanities, and other liberal arts-type programs.</li>
+              <li>Applicants are <strong>ranked by UPG</strong> within quota programs — the lower your UPG, the more competitive you are.</li>
+              <li>Strategize your program choices: put your most desired program first, but include at least one non-quota backup option.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- UP System Campuses -->
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;font-family:var(--font-mono);">— UP System Campuses</div>
+        <div class="campus-grid fade-up" style="margin-bottom:28px;">
+          <div class="campus-card"><div class="campus-name">UP Diliman</div><div class="campus-loc">Quezon City · Most competitive</div></div>
+          <div class="campus-card"><div class="campus-name">UP Manila</div><div class="campus-loc">Manila · Health Sciences focus</div></div>
+          <div class="campus-card"><div class="campus-name">UP Los Baños</div><div class="campus-loc">Laguna · Agriculture & Sci focus</div></div>
+          <div class="campus-card"><div class="campus-name">UP Visayas</div><div class="campus-loc">Iloilo City & Tacloban</div></div>
+          <div class="campus-card"><div class="campus-name">UP Mindanao</div><div class="campus-loc">Davao City</div></div>
+          <div class="campus-card"><div class="campus-name">UP Cebu</div><div class="campus-loc">Cebu City</div></div>
+          <div class="campus-card"><div class="campus-name">UP Baguio</div><div class="campus-loc">Baguio City</div></div>
+          <div class="campus-card"><div class="campus-name">UP Open University</div><div class="campus-loc">Los Baños · Distance Learning</div></div>
+        </div>
+
+        <!-- ===== SECTION 4: EXAM DETAILS ===== -->
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;font-family:var(--font-mono);">— UPCAT Exam Details</div>
+        <div class="subtests-grid fade-up" style="margin-bottom:28px;">
+          <div class="subtest-card">
+            <div class="subtest-title" style="color:var(--accent-3);">📖 Language Proficiency</div>
+            <div class="subtest-items">Vocabulary, grammar, sentence structure, analogies, Filipino language usage (tayutay, salawikain). Tests both English and Filipino proficiency. Approximately 50–60 items.</div>
+          </div>
+          <div class="subtest-card">
+            <div class="subtest-title" style="color:var(--cyan-bright);">📚 Reading Comprehension</div>
+            <div class="subtest-items">Passages with questions on main idea, inference, tone, and critical reading. Both English and Filipino texts included. Approximately 50–60 items.</div>
+          </div>
+          <div class="subtest-card">
+            <div class="subtest-title" style="color:var(--emerald-bright);">📐 Mathematics</div>
+            <div class="subtest-items">Algebra, geometry, trigonometry, statistics, word problems. Covers the K-12 curriculum up to Grade 12. No calculators allowed. Approximately 60 items.</div>
+          </div>
+          <div class="subtest-card">
+            <div class="subtest-title" style="color:var(--amber-bright);">🧪 Science</div>
+            <div class="subtest-items">Biology, Chemistry, Physics, Earth Science. Covers major concepts from Junior and Senior High School. Approximately 60 items.</div>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 5: WHAT TO BRING ===== -->
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;font-family:var(--font-mono);">— What to Bring on Exam Day</div>
+        <div class="guide-accordion fade-up">
+          <div class="guide-acc-header" onclick="toggleGuideAcc(this)">
+            <div class="guide-acc-icon" style="background:var(--amber-dim);color:var(--amber-bright);">🎒</div>
+            <div class="guide-acc-title">Exam Day Checklist — What to Bring & What NOT to Bring</div>
+            <i class="fas fa-chevron-down guide-acc-chevron"></i>
+          </div>
+          <div class="guide-acc-body">
+            <div class="grid-2" style="gap:16px;">
+              <div>
+                <div style="font-size:0.72rem;font-weight:700;color:var(--emerald-bright);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">✅ BRING THESE</div>
+                <ul class="guide-list">
+                  <li><strong>Printed UPCAT Test Permit</strong> — absolutely required, no permit = no entry.</li>
+                  <li><strong>At least 2 valid IDs</strong> — school ID + government-issued (e.g. PSA birth cert, PRC ID, passport, LTO ID).</li>
+                  <li><strong>#2 or HB pencils</strong> — at least 3 pencils. Answer sheets are machine-scanned.</li>
+                  <li><strong>Black ballpen</strong> — for personal details on answer sheets.</li>
+                  <li><strong>Eraser (good quality)</strong> — for corrections on your answer sheet.</li>
+                  <li><strong>Sharpener</strong> — small, manual only.</li>
+                  <li><strong>Snacks and water</strong> — eat before the exam. Some centers allow light snacks.</li>
+                  <li><strong>Comfortable clothing</strong> — test centers may be cold (aircon). Bring a light jacket.</li>
+                </ul>
+              </div>
+              <div>
+                <div style="font-size:0.72rem;font-weight:700;color:var(--rose);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">❌ DO NOT BRING THESE</div>
+                <ul class="guide-list">
+                  <li><strong>Calculators</strong> of any kind — strictly prohibited.</li>
+                  <li><strong>Mobile phones / tablets / smartwatches</strong> — must be left outside the testing room or fully turned off in bag.</li>
+                  <li><strong>Reviewers or notes</strong> — no reference materials allowed inside the testing room.</li>
+                  <li><strong>Rulers, protractors, or compasses</strong> — not allowed.</li>
+                  <li><strong>Electronic devices</strong> of any type.</li>
+                  <li><strong>Extra answer sheets</strong> — these are provided by the proctor.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 6: TEST PERMIT DETAILS ===== -->
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;font-family:var(--font-mono);margin-top:16px;">— Test Permit & Admission Slip</div>
+        <div class="guide-accordion fade-up">
+          <div class="guide-acc-header" onclick="toggleGuideAcc(this)">
+            <div class="guide-acc-icon" style="background:var(--purple-dim);color:var(--purple-bright);">🎟️</div>
+            <div class="guide-acc-title">Test Permit — What It Contains & How to Download It</div>
+            <i class="fas fa-chevron-down guide-acc-chevron"></i>
+          </div>
+          <div class="guide-acc-body">
+            <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.75;margin-bottom:14px;">Your UPCAT Test Permit is your official admission slip for the exam. It is generated after your application is approved and the application period closes. It contains:</p>
+            <ul class="guide-list">
+              <li><strong>Your assigned test center</strong> — the school or venue where you will take the exam (may be different from your own school).</li>
+              <li><strong>Testing room number</strong> — the specific room in the test center.</li>
+              <li><strong>Exam schedule</strong> — the date and time of your assigned session (morning or afternoon).</li>
+              <li><strong>Your applicant number</strong> — your unique UPCAT ID.</li>
+              <li><strong>Photo and personal information</strong> — as submitted in your application.</li>
+            </ul>
+            <div style="background:var(--amber-dim);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:14px 16px;margin-top:14px;">
+              <div style="font-weight:700;font-size:0.82rem;color:var(--amber-bright);margin-bottom:6px;">⚠️ Important Reminders</div>
+              <div style="font-size:0.78rem;color:var(--text-secondary);line-height:1.7;">Print your test permit on white bond paper (A4 or letter size). Do NOT resize, crop, or alter it. Bring 2 copies if possible. Log in to your OAS account to download it when it becomes available — usually 2–4 weeks before the exam date.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 7: IMPORTANT DEADLINES ===== -->
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;font-family:var(--font-mono);margin-top:16px;">— Typical UPCAT Timeline</div>
+        <div class="guide-timeline fade-up" style="margin-bottom:28px;">
+          <div class="guide-tl-item">
+            <div class="guide-tl-dot"></div>
+            <div class="guide-tl-content">
+              <div class="guide-tl-label">May – August: Application Period</div>
+              <div class="guide-tl-desc">The UPCAT online application window opens. Create your OAS account, fill out the form, upload documents, and pay the application fee before the deadline. Exact dates vary per year — monitor up.edu.ph for announcements.</div>
+            </div>
+          </div>
+          <div class="guide-tl-item">
+            <div class="guide-tl-dot" style="background:var(--cyan-bright);box-shadow:0 0 8px var(--cyan-glow);"></div>
+            <div class="guide-tl-content">
+              <div class="guide-tl-label">September – October: Application Review & Verification</div>
+              <div class="guide-tl-desc">UP verifies submitted applications and documents. Applicants with incomplete or incorrect submissions may be notified. Check your registered email regularly during this period.</div>
+            </div>
+          </div>
+          <div class="guide-tl-item">
+            <div class="guide-tl-dot" style="background:var(--emerald-bright);box-shadow:0 0 8px var(--emerald-glow);"></div>
+            <div class="guide-tl-content">
+              <div class="guide-tl-label">October – November: Test Permit Release</div>
+              <div class="guide-tl-desc">Approved applicants can now log in to the OAS and download their UPCAT Test Permits. Print it clearly on white bond paper.</div>
+            </div>
+          </div>
+          <div class="guide-tl-item">
+            <div class="guide-tl-dot" style="background:var(--amber-bright);box-shadow:0 0 8px var(--amber-glow);"></div>
+            <div class="guide-tl-content">
+              <div class="guide-tl-label">October – November: UPCAT Exam Day</div>
+              <div class="guide-tl-desc">The actual UPCAT is administered. Arrive 30 minutes early. Exam typically takes 4–5 hours total across all subtests with short breaks.</div>
+            </div>
+          </div>
+          <div class="guide-tl-item">
+            <div class="guide-tl-dot" style="background:var(--rose);box-shadow:0 0 8px var(--rose-glow);"></div>
+            <div class="guide-tl-content">
+              <div class="guide-tl-label">January – April: Results Release</div>
+              <div class="guide-tl-desc">UPCAT results are released on the official UP Admissions site. Passers are notified with their UPG and campus/program assignment. Enrollment instructions follow shortly after.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 8: COMMON MISTAKES ===== -->
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;font-family:var(--font-mono);">— Common Mistakes to Avoid</div>
+        <div class="guide-accordion fade-up">
+          <div class="guide-acc-header" onclick="toggleGuideAcc(this)">
+            <div class="guide-acc-icon" style="background:var(--rose-dim);color:var(--rose);">⚠️</div>
+            <div class="guide-acc-title">12 Critical Mistakes UPCAT Applicants Should Avoid</div>
+            <i class="fas fa-chevron-down guide-acc-chevron"></i>
+          </div>
+          <div class="guide-acc-body">
+            <ul class="guide-list">
+              <li><strong>Submitting incorrect or blurry documents.</strong> Your application may be rejected. Use clear, properly formatted scans or photos.</li>
+              <li><strong>Missing the application deadline.</strong> There are no extensions. Set multiple calendar reminders for all key dates.</li>
+              <li><strong>Forgetting to pay the application fee.</strong> Your application is NOT considered submitted until payment is confirmed.</li>
+              <li><strong>Using a wrong or inactive email address.</strong> All notifications come via email — use one you check regularly.</li>
+              <li><strong>Not double-checking your personal information.</strong> Errors in your name, birthday, or school info may cause problems when picking up your test permit or on results day.</li>
+              <li><strong>Not printing the test permit properly.</strong> Resizing, cropping, or printing on colored paper may cause issues at the test center.</li>
+              <li><strong>Arriving late on exam day.</strong> Test centers are strict — latecomers are not admitted. Aim to arrive 30–45 minutes early.</li>
+              <li><strong>Forgetting to bring valid IDs.</strong> You need at least 2 valid IDs on exam day alongside your permit.</li>
+              <li><strong>Bringing prohibited items.</strong> Calculators, phones, and smartwatches are not allowed. Getting caught can disqualify you.</li>
+              <li><strong>Leaving answers blank.</strong> The UPCAT does not use right-minus-wrong scoring — there is no penalty for wrong answers. Never leave items blank.</li>
+              <li><strong>Not choosing campus/course options strategically.</strong> Research quota vs non-quota programs and rank your choices wisely. Put realistic options as backups.</li>
+              <li><strong>Studying only a few weeks before the exam.</strong> Start your review at least 3–6 months before exam day for the best results.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 9: HOW UPG IS COMPUTED ===== -->
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;font-family:var(--font-mono);margin-top:16px;">— Understanding UPG</div>
+        <div class="guide-accordion fade-up">
+          <div class="guide-acc-header" onclick="toggleGuideAcc(this)">
+            <div class="guide-acc-icon" style="background:var(--accent-dim);color:var(--accent-3);">🔢</div>
+            <div class="guide-acc-title">How Is the UPG Computed?</div>
+            <i class="fas fa-chevron-down guide-acc-chevron"></i>
+          </div>
+          <div class="guide-acc-body">
+            <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.75;margin-bottom:14px;">The <strong style="color:var(--text-primary);">University Predicted Grade (UPG)</strong> is the score used by UP to rank all UPCAT applicants. It combines two components:</p>
+            <ul class="guide-list">
+              <li><strong>UPCAT Score (approx. 40% weight):</strong> Based on your Transmuted Score (TS), which is derived from your raw scores across all 4 subtests (Language Proficiency, Reading Comprehension, Math, Science).</li>
+              <li><strong>High School GWA (approx. 60% weight):</strong> Your cumulative Grade 11 and (partial) Grade 12 GWA, converted to the UP 1.0–5.0 grade scale.</li>
+              <li><strong>Lower UPG = Better performance.</strong> A UPG of 1.0 is the best; 5.0 is the lowest acceptable.</li>
+              <li><strong>Important:</strong> The exact UPG formula is not officially published by UP. The weights above are community estimates based on available data from UP alumni. The formula may differ slightly from year to year.</li>
+            </ul>
+            <div style="background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:10px;padding:14px 16px;margin-top:14px;">
+              <div style="font-weight:700;font-size:0.82rem;color:var(--accent-3);margin-bottom:6px;">💡 Use the UPG Calculator</div>
+              <div style="font-size:0.78rem;color:var(--text-secondary);line-height:1.7;">Use the UPG Calculator tab in this vault to get an estimated UPG based on your UPCAT percentile rank and GWA. It uses the community-estimated formula.</div>
+              <button class="btn btn-primary btn-sm" onclick="showSection('upg')" style="margin-top:10px;"><i class="fas fa-calculator"></i> Open UPG Calculator</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 10: HOW TO CHECK RESULTS ===== -->
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;font-family:var(--font-mono);margin-top:16px;">— After the Exam</div>
+        <div class="guide-accordion fade-up">
+          <div class="guide-acc-header" onclick="toggleGuideAcc(this)">
+            <div class="guide-acc-icon" style="background:var(--emerald-dim);color:var(--emerald-bright);">📊</div>
+            <div class="guide-acc-title">How to Check Your UPCAT Results</div>
+            <i class="fas fa-chevron-down guide-acc-chevron"></i>
+          </div>
+          <div class="guide-acc-body">
+            <ul class="guide-list">
+              <li>Results are released on the <strong>official UP System website (up.edu.ph)</strong> and individual campus websites.</li>
+              <li>Log in to your <strong>OAS account</strong> using the same credentials from your application to view your personalized results and UPG.</li>
+              <li>Results show whether you <strong>passed, are on the waitlist, or did not pass</strong> for each of your chosen programs.</li>
+              <li>Passers receive their UPG and instructions for the <strong>enrollment process</strong>. Follow the enrollment deadline strictly.</li>
+              <li>Waitlisted applicants may be admitted if enrolled passers do not claim their slots within the given timeframe.</li>
+              <li>Applicants who did not pass may <strong>file an appeal for reconsideration</strong> within the specified period — check the campus website for the process.</li>
+              <li>Even if you don't pass, explore <strong>other pathways into UP</strong> — UPCAT-free enrollment programs exist for some units (e.g., UP Open University online courses, transfer student programs).</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- ===== FAQs ===== -->
+        <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;font-family:var(--font-mono);margin-top:16px;">— FAQs</div>
+        <div id="guide-faqs" class="fade-up">
+          <div class="guide-faq-item">
+            <div class="guide-faq-q" onclick="toggleFaq(this)">Is the UPCAT free to take? <i class="fas fa-chevron-down"></i></div>
+            <div class="guide-faq-a">No — there is an application fee, but qualified low-income applicants may apply for a fee waiver using a Notice of Assessment (NOA) from DSWD or proof of CHED scholarship. The fee is typically below ₱500. Check the official UP Admissions site for the current fee.</div>
+          </div>
+          <div class="guide-faq-item">
+            <div class="guide-faq-q" onclick="toggleFaq(this)">What are the UPCAT exam materials I must bring? <i class="fas fa-chevron-down"></i></div>
+            <div class="guide-faq-a">You must bring: (1) printed UPCAT Test Permit, (2) at least two valid IDs, (3) #2 or HB pencils (at least 3), (4) a black ballpen, and (5) an eraser. Calculators, phones, smartwatches, and all electronic devices are strictly prohibited inside the testing room.</div>
+          </div>
+          <div class="guide-faq-item">
+            <div class="guide-faq-q" onclick="toggleFaq(this)">Is there a right-minus-wrong penalty in the UPCAT? <i class="fas fa-chevron-down"></i></div>
+            <div class="guide-faq-a">No. The UPCAT does NOT use right-minus-wrong scoring. There is no deduction for wrong answers. This means you should never leave any item blank — always make an educated guess if unsure.</div>
+          </div>
+          <div class="guide-faq-item">
+            <div class="guide-faq-q" onclick="toggleFaq(this)">How is the UPG calculated? <i class="fas fa-chevron-down"></i></div>
+            <div class="guide-faq-a">The University Predicted Grade (UPG) combines your UPCAT Transmuted Score (TS) and your High School GWA. The official formula is not publicly released, but community estimates suggest approximately a 40/60 split between UPCAT score contribution and high school GWA. The lower the UPG, the better.</div>
+          </div>
+          <div class="guide-faq-item">
+            <div class="guide-faq-q" onclick="toggleFaq(this)">Can I take the UPCAT more than once? <i class="fas fa-chevron-down"></i></div>
+            <div class="guide-faq-a">No. You can only take the UPCAT once in your lifetime. This makes thorough preparation extremely important — every review session counts.</div>
+          </div>
+          <div class="guide-faq-item">
+            <div class="guide-faq-q" onclick="toggleFaq(this)">When are UPCAT results released? <i class="fas fa-chevron-down"></i></div>
+            <div class="guide-faq-a">Results are typically released 4–6 months after the exam, usually between January and April of the following year. Results are announced via the official UP Admissions website (up.edu.ph) and individual campus sites. Use your OAS credentials to view your personalized results.</div>
+          </div>
+          <div class="guide-faq-item">
+            <div class="guide-faq-q" onclick="toggleFaq(this)">Should I enroll in a review center? <i class="fas fa-chevron-down"></i></div>
+            <div class="guide-faq-a">Not necessarily. Many UPCAT passers prepared entirely through self-study using free reviewers, practice tests, and online resources. What matters most is consistent, disciplined review over several months. A good reviewer and structured study plan can be just as effective — which is exactly what this vault provides for free.</div>
+          </div>
+          <div class="guide-faq-item">
+            <div class="guide-faq-q" onclick="toggleFaq(this)">What if I fail the UPCAT? <i class="fas fa-chevron-down"></i></div>
+            <div class="guide-faq-a">There are still pathways into UP: the UP Open University (UPOU) offers degree programs accessible without UPCAT. You may also explore lateral transfer opportunities after completing 1–2 years in another accredited university. Additionally, you can still pursue other excellent Philippine universities — DLSU, AdMU, UST, PUP, and others offer equally strong academic programs.</div>
+          </div>
+        </div>
+
+        <!-- Reference Note -->
+        <div class="card fade-up" style="margin-top:20px;background:var(--bg-elevated);border-color:var(--accent-border);">
+          <div style="font-size:0.78rem;color:var(--text-secondary);line-height:1.75;">
+            <strong style="color:var(--accent-3);">📚 Reference:</strong> The guide content above is based on publicly available UPCAT information from FilipiKnow's Ultimate UPCAT Guide and UP System official communications. Always verify the most current requirements at <a href="https://www.up.edu.ph/admission/" target="_blank" style="color:var(--accent-3);text-decoration:underline;">up.edu.ph/admission</a> as details may change annually.
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SETTINGS ============ -->
+      <section class="section" id="sec-settings">
+        <div class="section-header">
+          <h1>⚙️ Settings</h1>
+          <p>Customize your UPCAT Vault experience. Data is saved locally in your browser.</p>
+        </div>
+
+        <div class="settings-group fade-up">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px;font-family:var(--font-mono);">Appearance</div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Dark / Light Mode</div>
+              <div class="settings-sub">Toggle between dark and light themes</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="toggleTheme()">
+              <i class="fas fa-moon"></i> Toggle Theme
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-group fade-up">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px;font-family:var(--font-mono);">Data & Progress</div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Reset All Progress</div>
+              <div class="settings-sub">Clears all XP, completed topics, tasks, and settings. This cannot be undone.</div>
+            </div>
+            <button class="btn btn-sm" onclick="resetData()" style="background:var(--rose-dim);color:var(--rose);border-color:rgba(244,63,94,0.25);">
+              <i class="fas fa-trash"></i> Reset Data
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-group fade-up">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px;font-family:var(--font-mono);">About</div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">UPCAT 2026 Master Vault</div>
+              <div class="settings-sub">Free · Open · No login required · All data saved locally</div>
+            </div>
+            <div style="font-size:0.72rem;color:var(--text-muted);font-family:var(--font-mono);">v3.0</div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Created by</div>
+              <div class="settings-sub">Ian Lorenzo Herico</div>
+            </div>
+            <div style="font-size:0.72rem;color:var(--accent-2);font-weight:700;">🇵🇭</div>
+          </div>
+          <div class="settings-row" style="border-bottom:none;padding-bottom:0;">
+            <div>
+              <div class="settings-label">Disclaimer</div>
+              <div class="settings-sub">This is a community study tool. Not affiliated with UP System or CHED. Always verify official information at up.edu.ph.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main><!-- end .content -->
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div>
+        <div class="footer-brand">⚡ UPCAT 2026 Master Vault</div>
+        <div>Free for all Filipino UPCAT aspirants · Made with ❤️ by Ian Lorenzo Herico</div>
+      </div>
+      <div class="footer-links">
+        <a href="#" onclick="showSection('official')">Resources</a>
+        <a href="#" onclick="showSection('guide')">Guide</a>
+        <a href="#" onclick="showSection('upg')">UPG Calc</a>
+        <a href="#" onclick="showSection('settings')">Settings</a>
+        <a href="https://www.up.edu.ph/admission/" target="_blank">Official UP Admissions</a>
+      </div>
+    </footer>
+
+  </div><!-- end .main -->
+</div><!-- end .app -->
+
+<!-- PDF Modal -->
+<div class="pdf-modal" id="pdfModal">
+  <div class="pdf-modal-inner">
+    <div class="pdf-modal-topbar">
+      <div class="pdf-modal-title" id="pdfModalTitle">Reviewer</div>
+      <a id="pdfModalNewTab" href="#" target="_blank" class="btn btn-secondary btn-sm"><i class="fas fa-external-link-alt"></i> Open in Tab</a>
+      <button class="btn btn-secondary btn-sm" onclick="closePdfModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <iframe id="pdfModalFrame" src="" allowfullscreen title="PDF Viewer"></iframe>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toast-text">Action completed!</span>
+</div>
+
+<!-- Back to Top -->
+<button class="back-to-top" id="backToTop" onclick="scrollToTop()" aria-label="Back to top">
+  <i class="fas fa-arrow-up"></i>
+</button>
+
+<!-- Script -->
+<script src="script.js"></script>
+</body>
+</html>
