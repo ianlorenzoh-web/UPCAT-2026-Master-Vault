@@ -194,27 +194,27 @@ function showToast(msg) {
    ---------------------------------------------------------------- */
 const reviewers = [
   {
-    id:'apex', title:'APEX UPCAT Reviewer 2024',
-    cover:'cover-a', emoji:'🚀',
-    desc:'The most comprehensive and up-to-date UPCAT reviewer covering all four subtests with in-depth explanations.',
-    diff:'Hard', time:'25–35 hrs', pages:'~500 pages',
-    tags:['Most Comprehensive','2024 Updated','Best Overall'], cat:'indigo',
-    link:'https://drive.google.com/file/d/1bJmE3B2FP3o8MIjGJZGkIl4iJNjEHoep/view?usp=drivesdk',
-    embedId:'1bJmE3B2FP3o8MIjGJZGkIl4iJNjEHoep'
+    id:'academic_gateway', title:'Academic Gateway',
+    cover:'cover-a', emoji:'🎓',
+    desc:'A comprehensive UPCAT reviewer covering all four subtests with clear explanations and well-structured content for serious aspirants.',
+    diff:'Medium', time:'20–30 hrs', pages:'~400 pages',
+    tags:['All Subjects','Well-Structured','Best for Beginners'], cat:'indigo',
+    link:'https://drive.google.com/file/d/1Cywj8OlSsJhQAfyqHlzegiZVJd2uAxfl/view?usp=drivesdk',
+    embedId:'1Cywj8OlSsJhQAfyqHlzegiZVJd2uAxfl'
   },
   {
-    id:'stp', title:'Science & Technology Philippines',
-    cover:'cover-b', emoji:'🧪',
-    desc:'Science-focused reviewer with excellent coverage of Biology, Chemistry, Physics, and Earth Science with detailed notes.',
-    diff:'Medium', time:'15–20 hrs', pages:'~220 pages',
-    tags:['Science Focus','Detailed Notes','K-12 Aligned'], cat:'emerald',
-    link:'https://drive.google.com/file/d/1RbE9yFpxqJHnjkZ3rG7lW2Tc8EKd5Mkp/view?usp=drivesdk',
-    embedId:'1RbE9yFpxqJHnjkZ3rG7lW2Tc8EKd5Mkp'
+    id:'collegio_advance', title:'Collegio Advance',
+    cover:'cover-b', emoji:'📗',
+    desc:'A solid all-around reviewer with strong coverage of Language Proficiency, Reading Comprehension, and Science topics aligned with K-12.',
+    diff:'Medium', time:'18–25 hrs', pages:'~350 pages',
+    tags:['All Subjects','K-12 Aligned','Language Focus'], cat:'emerald',
+    link:'https://drive.google.com/file/d/13x0wXIVTF6hd0HFBZ9TzcG93qlMjy6cH/view?usp=drivesdk',
+    embedId:'13x0wXIVTF6hd0HFBZ9TzcG93qlMjy6cH'
   },
   {
-    id:'filipinas', title:'Filipinas Reviewer (Classic)',
-    cover:'cover-c', emoji:'🇵🇭',
-    desc:'Classic UPCAT reviewer trusted for decades. Strong Filipino Language and Reading Comprehension coverage.',
+    id:'maroon_bluebook', title:'Maroon Bluebook 4th Edition',
+    cover:'cover-c', emoji:'📘',
+    desc:'The classic community favorite. Trusted for its depth in Filipino Language and Reading Comprehension, with detailed explanations across all subtests.',
     diff:'Medium', time:'30–40 hrs', pages:'~400 pages',
     tags:['Classic','Explanation-rich','Most Popular'], cat:'amber',
     link:'https://drive.google.com/file/d/1sCGl08sFqNEFNNEoBXoAliL2HvMM4E0q/view?usp=drivesdk',
@@ -223,9 +223,9 @@ const reviewers = [
   {
     id:'msa', title:'MSA 2024',
     cover:'cover-d', emoji:'🔬',
-    desc:'Latest 2024 reviewer aligned with the modern K-12 curriculum. Science and Math heavy with fully updated content.',
+    desc:'Latest 2024 reviewer aligned with the modern K-12 curriculum. Science and Math heavy with fully updated content and practice sets.',
     diff:'Medium', time:'20–28 hrs', pages:'~290 pages',
-    tags:['2024 Updated','K-12 Aligned','Science Focus'], cat:'indigo',
+    tags:['2024 Updated','K-12 Aligned','Science & Math Focus'], cat:'indigo',
     link:'https://drive.google.com/file/d/1MhXc23EWEopBWVE_c-qCN2rz-vS3gidW/view?usp=drivesdk',
     embedId:'1MhXc23EWEopBWVE_c-qCN2rz-vS3gidW'
   },
