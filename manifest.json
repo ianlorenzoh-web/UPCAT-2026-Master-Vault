@@ -1,0 +1,80 @@
+{
+  "name": "UPCAT 2027 Master Vault",
+  "short_name": "UPCAT Vault",
+  "description": "The ultimate free study hub for UPCAT 2027 aspirants. Reviewers, formulas, mock tests, study plans, and progress tracking.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#050711",
+  "theme_color": "#6366f1",
+  "lang": "en-PH",
+  "dir": "ltr",
+  "categories": ["education", "productivity"],
+
+  "icons": [
+    { "src": "icons/icon-72x72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-96x96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-128x128.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-144x144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-152x152.png", "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-384x384.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+
+  "screenshots": [
+    {
+      "src": "screenshots/desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard — UPCAT 2027 Master Vault"
+    },
+    {
+      "src": "screenshots/mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile view — Formula Sheet"
+    }
+  ],
+
+  "shortcuts": [
+    {
+      "name": "Formula Sheet",
+      "short_name": "Formulas",
+      "description": "Quick access to all UPCAT formulas",
+      "url": "/?section=formulas",
+      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Task Tracker",
+      "short_name": "Tracker",
+      "description": "Check your study progress",
+      "url": "/?section=tasks",
+      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Mock Tests",
+      "short_name": "Mock Tests",
+      "description": "Take a practice exam",
+      "url": "/?section=mocks",
+      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+
+  "related_applications": [],
+  "prefer_related_applications": false,
+
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

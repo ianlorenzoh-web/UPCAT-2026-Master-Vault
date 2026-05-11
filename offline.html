@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Offline — UPCAT 2027 Vault</title>
+  <style>
+    :root {
+      --bg: #050711;
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.35);
+      --text: #f0f2ff;
+      --text-sub: #8b95c8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      padding: 2rem;
+      text-align: center;
+    }
+    .wrap { max-width: 400px; }
+    .icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      display: block;
+      filter: drop-shadow(0 0 20px var(--accent-glow));
+    }
+    h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.75rem; }
+    p  { color: var(--text-sub); line-height: 1.7; margin-bottom: 1.5rem; font-size: 0.95rem; }
+    .tip {
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+    .tip strong { color: var(--accent); display: block; margin-bottom: 0.4rem; }
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0.75rem 2rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="icon">⚡</span>
+    <h1>You're Offline</h1>
+    <p>
+      No internet connection detected. Don't worry — if you've visited the vault before,
+      your app shell, formulas, and saved progress are available offline.
+    </p>
+    <div class="tip">
+      <strong>💡 While you wait:</strong>
+      Your task tracker, XP progress, formula sheet, and study plans are all saved
+      locally on your device and will be available once the app loads from cache.
+      Navigate back to the main page to access them.
+    </div>
+    <button onclick="window.location.reload()">↺ Try Again</button>
+  </div>
+</body>
+</html>
