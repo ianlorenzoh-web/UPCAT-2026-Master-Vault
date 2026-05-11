@@ -78,7 +78,8 @@ function showSection(id, navEl) {
 
   // update topbar title
   const titles = {
-    dashboard:'Dashboard', reviewers:'Full Reviewers', topics:'Subject Topics',
+    dashboard:'Dashboard', reviewers:'Full Reviewers', 'other-reviewers':'Other Reviewers',
+    topics:'Subject Topics',
     plans:'Study Plans', formulas:'Formula Sheet', tasks:'Task Tracker',
     tips:'Exam Tips', achievements:'Achievements', official:'Official Resources',
     mocks:'Mock Tests & Simulations', upg:'UPG Calculator',
@@ -1197,40 +1198,36 @@ function initScrollReveal() {
 }
 
 /* ----------------------------------------------------------------
-   TOTAL VISIT COUNTER — CountAPI (countapi.xyz)
-   Increments and displays a persistent all-time visit count.
-   Namespace is scoped to this vault so it won't collide with others.
+   TOTAL VISIT COUNTER — counterapi.dev
+   Free, no-signup persistent hit counter. Increments once per
+   browser session and displays the all-time total.
    Falls back silently if the API is unreachable.
    ---------------------------------------------------------------- */
-const _COUNTAPI_KEY  = 'upcat-vault-2027-visits';
-const _COUNTAPI_NS   = 'upcat-master-vault';
+const _COUNTER_ID = 'upcat-master-vault-2027';
 
 async function initTotalVisitCounter() {
   const el = document.getElementById('total-visit-count');
   if (!el) return;
 
-  // Check if this tab has already been counted this session
-  // to avoid inflating on every hot-reload / navigation within the SPA.
+  // Only increment once per browser session to avoid inflation on
+  // in-page navigation or hot-reloads.
   if (sessionStorage.getItem('upcat_visit_counted')) {
-    // Just fetch the current value without incrementing
     try {
-      const res  = await fetch(`https://api.countapi.xyz/get/${_COUNTAPI_NS}/${_COUNTAPI_KEY}`);
+      const res  = await fetch(`https://api.counterapi.dev/v1/${_COUNTER_ID}/get`);
       const data = await res.json();
-      if (typeof data.value === 'number') el.textContent = data.value.toLocaleString();
-    } catch(e) {}
+      if (typeof data.count === 'number') el.textContent = data.count.toLocaleString();
+    } catch(e) { el.textContent = '—'; }
     return;
   }
 
   try {
-    // hit/create increments the counter by 1 and returns the new value
-    const res  = await fetch(`https://api.countapi.xyz/hit/${_COUNTAPI_NS}/${_COUNTAPI_KEY}`);
+    const res  = await fetch(`https://api.counterapi.dev/v1/${_COUNTER_ID}/up`);
     const data = await res.json();
-    if (typeof data.value === 'number') {
-      el.textContent = data.value.toLocaleString();
+    if (typeof data.count === 'number') {
+      el.textContent = data.count.toLocaleString();
       sessionStorage.setItem('upcat_visit_counted', '1');
     }
   } catch(e) {
-    // API unreachable — show a dash rather than an error
     el.textContent = '—';
   }
 }
