@@ -1,5 +1,5 @@
 /* ================================================================
-   UPCAT 2026 MASTER VAULT — script.js
+   UPCAT 2027 MASTER VAULT — script.js
    Website Idea & Concept by Ian Lorenzo Herico
    ================================================================ */
 
@@ -84,7 +84,7 @@ function showSection(id, navEl) {
     mocks:'Mock Tests & Simulations', upg:'UPG Calculator',
     guide:'UPCAT Process Guide', settings:'Settings', credits:'Credits'
   };
-  document.getElementById('topbar-title').textContent = titles[id] || 'UPCAT 2026 Master Vault';
+  document.getElementById('topbar-title').textContent = titles[id] || 'UPCAT 2027 Master Vault';
 
   // close sidebar on mobile
   if (window.innerWidth <= 768) closeSidebar();
@@ -137,7 +137,7 @@ function closeSidebar() {
    COUNTDOWN — Dynamic (targets August 2026)
    ---------------------------------------------------------------- */
 function updateCountdown() {
-  // UPCAT 2026 typically held in August — use August 1, 2026 as target
+  // UPCAT 2027 is held on August 1–2, 2026 — countdown to Day 1
   const target = new Date('2026-08-01T08:00:00+08:00');
   const now    = new Date();
   const diff   = target - now;
@@ -173,7 +173,7 @@ const quotes = [
   {text:'"It always seems impossible until it\'s done."', author:'— Nelson Mandela'},
   {text:'"Hard work beats talent when talent doesn\'t work hard."', author:'— Tim Notke'},
   {text:'"The difference between ordinary and extraordinary is that little extra."', author:'— Jimmy Johnson'},
-  {text:'"Your dream university is waiting. Every review session brings you closer."', author:'— UPCAT 2026 Vault'},
+  {text:'"Your dream university is waiting. Every review session brings you closer."', author:'— UPCAT 2027 Vault'},
   {text:'"Magsipag ka. Ang tagumpay ay hindi darating sa tamad."', author:'— Filipino Wisdom'},
   {text:'"Ang edukasyon ang tanging kayamanan na hindi maaaring kunin sa iyo."', author:'— Jose Rizal (paraphrased)'},
   {text:'"Don\'t watch the clock; do what it does. Keep going."', author:'— Sam Levenson'},
