@@ -1188,6 +1188,136 @@ input, select, textarea { font-family: inherit; }
 .ctb-delete:hover { background: var(--rose); color: #fff; }
 
 /* ----------------------------------------------------------------
+   DAILY QUESTS
+   ---------------------------------------------------------------- */
+.quests-card { padding: 6px 0; }
+.quest-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; border-bottom: 1px solid var(--glass-border);
+  transition: background var(--transition);
+}
+.quest-row:last-child { border-bottom: none; }
+.quest-row:hover { background: var(--glass-hover); }
+.quest-row.quest-done { opacity: 0.65; }
+.quest-info { flex: 1; min-width: 0; }
+.quest-text {
+  font-size: 0.84rem; font-weight: 600; color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.quest-row.quest-done .quest-text { text-decoration: line-through; color: var(--text-muted); }
+.quest-progress-bar {
+  height: 4px; background: var(--glass-border); border-radius: 99px;
+  overflow: hidden; margin-bottom: 4px;
+}
+.quest-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--cyan));
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+.quest-row.quest-done .quest-progress-fill { background: var(--emerald); }
+.quest-progress-label {
+  font-size: 0.68rem; color: var(--text-muted); font-family: var(--font-mono);
+}
+.quest-xp-badge {
+  font-size: 0.7rem; font-weight: 800;
+  background: var(--accent-dim); color: var(--accent-3);
+  border: 1px solid var(--accent-border);
+  padding: 4px 10px; border-radius: 99px;
+  white-space: nowrap; flex-shrink: 0;
+  font-family: var(--font-mono);
+}
+.quest-row.quest-done .quest-xp-badge {
+  background: var(--emerald-dim); color: var(--emerald-bright);
+  border-color: rgba(16,185,129,0.25);
+}
+
+/* ----------------------------------------------------------------
+   STUDY HEATMAP
+   ---------------------------------------------------------------- */
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(18, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  gap: 3px;
+  min-width: 360px;
+  margin-bottom: 10px;
+  grid-auto-flow: column;
+}
+.heatmap-cell {
+  width: 100%; aspect-ratio: 1;
+  border-radius: 3px;
+  transition: transform 0.15s ease;
+  cursor: default;
+}
+.heatmap-cell:hover { transform: scale(1.4); }
+.heatmap-cell.level-0 { background: var(--glass-border); }
+.heatmap-cell.level-1 { background: rgba(99,102,241,0.25); }
+.heatmap-cell.level-2 { background: rgba(99,102,241,0.5); }
+.heatmap-cell.level-3 { background: rgba(99,102,241,0.75); }
+.heatmap-cell.level-4 { background: #6366f1; box-shadow: 0 0 6px var(--accent-glow); }
+[data-theme="light"] .heatmap-cell.level-0 { background: rgba(0,0,0,0.07); }
+.heatmap-legend {
+  display: flex; align-items: center; gap: 5px; margin-top: 8px;
+}
+.heatmap-legend .heatmap-cell {
+  width: 12px; height: 12px; aspect-ratio: unset; flex-shrink: 0;
+}
+
+/* ----------------------------------------------------------------
+   STUDY THIS NEXT CARD
+   ---------------------------------------------------------------- */
+.study-next-card { padding: 0; overflow: hidden; }
+.study-next-inner {
+  padding: 22px 24px;
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+}
+.study-next-label {
+  font-size: 0.65rem; font-weight: 800; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--text-muted);
+  font-family: var(--font-mono); margin-bottom: 4px;
+}
+.study-next-subject {
+  font-size: 1.1rem; font-weight: 800; margin-bottom: 2px;
+}
+.study-next-topic {
+  font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 14px;
+}
+.study-next-inner > div { flex: 1; min-width: 180px; }
+
+/* ----------------------------------------------------------------
+   GENERIC CARD UTILITY (used by quests, heatmap, etc.)
+   ---------------------------------------------------------------- */
+.card {
+  background: var(--bg-card); border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+
+/* ----------------------------------------------------------------
+   HERO GREETING (replaces static hero <p>)
+   ---------------------------------------------------------------- */
+#hero-greeting {
+  transition: opacity 0.4s ease;
+}
+
+/* ----------------------------------------------------------------
+   PRINT REPORT
+   ---------------------------------------------------------------- */
+@media print {
+  .sidebar, .topbar, .hero-banner, .stat-card,
+  .countdown-wrap, .quick-grid, .pomo-wrap,
+  .custom-timers-section, .quests-card,
+  #study-heatmap, .study-next-card,
+  .site-footer, .back-to-top, .toast,
+  .bg-grid, .bg-orbs, .loader,
+  button, nav { display: none !important; }
+
+  body, html { background: #fff !important; color: #111 !important; }
+  .main { margin-left: 0 !important; }
+  #sec-progress-report { display: block !important; }
+}
+
+/* ----------------------------------------------------------------
    CREDITS SECTION — Fix #6/#7: Two-photo gallery layout
    ---------------------------------------------------------------- */
 .credits-section {
