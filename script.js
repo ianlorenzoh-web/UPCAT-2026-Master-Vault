@@ -82,7 +82,7 @@ function showSection(id, navEl) {
     plans:'Study Plans', formulas:'Formula Sheet', tasks:'Task Tracker',
     tips:'Exam Tips', achievements:'Achievements', official:'Official Resources',
     mocks:'Mock Tests & Simulations', upg:'UPG Calculator',
-    guide:'UPCAT Process Guide', settings:'Settings'
+    guide:'UPCAT Process Guide', settings:'Settings', credits:'Credits'
   };
   document.getElementById('topbar-title').textContent = titles[id] || 'UPCAT 2026 Master Vault';
 
@@ -103,8 +103,9 @@ function showSection(id, navEl) {
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const ov = document.getElementById('overlay');
-  sb.classList.toggle('open');
-  ov.style.display = sb.classList.contains('open') ? 'block' : 'none';
+  const isOpen = sb.classList.toggle('open');
+  // Show or hide overlay without any CSS filter/blur on the page
+  ov.style.display = isOpen ? 'block' : 'none';
 }
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
@@ -801,9 +802,25 @@ function handleSearch(val) {
 }
 
 /* ----------------------------------------------------------------
-   POMODORO TIMER
+   POMODORO TIMER — Enhanced with custom time input
    ---------------------------------------------------------------- */
 let pomoRunning=false, pomoTime=25*60, pomoTotal=25*60, pomoInterval=null, pomoMode='work';
+
+/* Set custom duration from the hrs/min inputs */
+function setCustomPomo() {
+  const hrs = parseInt(document.getElementById('pomo-hrs-input').value) || 0;
+  const min = parseInt(document.getElementById('pomo-min-input').value) || 0;
+  const totalSec = (hrs * 3600) + (min * 60);
+  if (totalSec < 60) { showToast('⚠️ Please set at least 1 minute.'); return; }
+  // Stop any running timer before applying
+  clearInterval(pomoInterval); pomoRunning=false;
+  pomoTime = totalSec; pomoTotal = totalSec; pomoMode='work';
+  document.getElementById('pomo-start').textContent='Start';
+  document.getElementById('pomo-mode-label').textContent = 'CUSTOM FOCUS SESSION';
+  updatePomoDisplay();
+  showToast(`⏱ Timer set to ${hrs?hrs+'h ':''}${min}m`);
+}
+
 function togglePomo() {
   if (pomoRunning) {
     clearInterval(pomoInterval); pomoRunning=false;
@@ -815,8 +832,15 @@ function togglePomo() {
       pomoTime--;
       if (pomoTime<=0) {
         clearInterval(pomoInterval); pomoRunning=false;
-        if(pomoMode==='work'){showToast('✅ Focus session done! Take a 5-min break.');pomoMode='break';pomoTime=5*60;pomoTotal=5*60;}
-        else{showToast('🔋 Break done! Time to focus.');pomoMode='work';pomoTime=25*60;pomoTotal=25*60;}
+        if(pomoMode==='work'){
+          showToast('✅ Focus session done! Take a 5-min break.');
+          pomoMode='break'; pomoTime=5*60; pomoTotal=5*60;
+          document.getElementById('pomo-mode-label').textContent='BREAK TIME';
+        } else {
+          showToast('🔋 Break done! Time to focus.');
+          pomoMode='work'; pomoTime=25*60; pomoTotal=25*60;
+          document.getElementById('pomo-mode-label').textContent='FOCUS SESSION';
+        }
         document.getElementById('pomo-start').textContent='Start';
       }
       updatePomoDisplay();
@@ -827,14 +851,124 @@ function resetPomo() {
   clearInterval(pomoInterval); pomoRunning=false;
   pomoTime=25*60; pomoTotal=25*60; pomoMode='work';
   document.getElementById('pomo-start').textContent='Start';
+  if(document.getElementById('pomo-mode-label'))
+    document.getElementById('pomo-mode-label').textContent='FOCUS SESSION';
   updatePomoDisplay();
 }
 function updatePomoDisplay() {
-  const m=String(Math.floor(pomoTime/60)).padStart(2,'0');
+  const h=Math.floor(pomoTime/3600);
+  const m=String(Math.floor((pomoTime%3600)/60)).padStart(2,'0');
   const s=String(pomoTime%60).padStart(2,'0');
-  document.getElementById('pomo-display').textContent=`${m}:${s}`;
+  document.getElementById('pomo-display').textContent = h ? `${h}:${m}:${s}` : `${m}:${s}`;
   const offset=408-(408*(pomoTotal-pomoTime)/pomoTotal);
   document.getElementById('pomo-circle').style.strokeDashoffset=offset;
+}
+
+/* ----------------------------------------------------------------
+   CUSTOM TIMERS — Independent named countdown timers
+   ---------------------------------------------------------------- */
+const customTimers = []; // {id, name, total, remaining, running, interval}
+
+function addCustomTimer() {
+  const name = document.getElementById('ct-name-input').value.trim() || 'Timer';
+  const hrs  = parseInt(document.getElementById('ct-hrs-input').value) || 0;
+  const min  = parseInt(document.getElementById('ct-min-input').value) || 0;
+  const totalSec = (hrs * 3600) + (min * 60);
+  if (totalSec < 60) { showToast('⚠️ Please set at least 1 minute for the custom timer.'); return; }
+  const id = Date.now();
+  customTimers.push({ id, name, total: totalSec, remaining: totalSec, running: false, interval: null });
+  document.getElementById('ct-name-input').value = '';
+  document.getElementById('ct-hrs-input').value  = '';
+  document.getElementById('ct-min-input').value  = '';
+  renderCustomTimers();
+  showToast(`⏲ "${name}" timer added!`);
+}
+
+function toggleCustomTimer(id) {
+  const t = customTimers.find(t=>t.id===id);
+  if (!t || t.remaining<=0) return;
+  if (t.running) {
+    clearInterval(t.interval); t.running=false;
+  } else {
+    t.running=true;
+    t.interval=setInterval(()=>{
+      t.remaining--;
+      if (t.remaining<=0) {
+        clearInterval(t.interval); t.running=false; t.remaining=0;
+        showToast(`🔔 "${t.name}" timer finished!`);
+      }
+      renderCustomTimers();
+    },1000);
+  }
+  renderCustomTimers();
+}
+
+function resetCustomTimer(id) {
+  const t = customTimers.find(t=>t.id===id);
+  if (!t) return;
+  clearInterval(t.interval); t.running=false; t.remaining=t.total;
+  renderCustomTimers();
+}
+
+function deleteCustomTimer(id) {
+  const idx = customTimers.findIndex(t=>t.id===id);
+  if (idx<0) return;
+  clearInterval(customTimers[idx].interval);
+  customTimers.splice(idx,1);
+  renderCustomTimers();
+}
+
+function fmtTime(sec) {
+  const h=Math.floor(sec/3600);
+  const m=String(Math.floor((sec%3600)/60)).padStart(2,'0');
+  const s=String(sec%60).padStart(2,'0');
+  return h ? `${h}:${m}:${s}` : `${m}:${s}`;
+}
+
+function renderCustomTimers() {
+  const list = document.getElementById('custom-timer-list');
+  if (!list) return;
+  if (customTimers.length===0) {
+    list.innerHTML = '<div style="font-size:0.78rem;color:var(--text-muted);padding:10px 0;">No custom timers yet. Add one above!</div>';
+    return;
+  }
+  list.innerHTML = customTimers.map(t=>{
+    const pct = t.total > 0 ? ((t.total-t.remaining)/t.total) : 1;
+    const r=36; const circ=2*Math.PI*r;
+    const dash=circ; const offset=circ*pct;
+    const status = t.remaining<=0 ? 'Done!' : t.running ? 'Running…' : 'Paused';
+    return `
+    <div class="custom-timer-card">
+      <div class="custom-timer-svg-wrap">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--glass-border)" stroke-width="4"/>
+          <circle cx="40" cy="40" r="${r}" fill="none"
+            stroke="url(#ctGrad${t.id})" stroke-width="4"
+            stroke-dasharray="${circ}" stroke-dashoffset="${dash-offset}"
+            stroke-linecap="round" transform="rotate(-90 40 40)"
+            style="transition:stroke-dashoffset 0.8s ease;"/>
+          <defs>
+            <linearGradient id="ctGrad${t.id}" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#06b6d4"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="custom-timer-display">${fmtTime(t.remaining)}</div>
+      </div>
+      <div class="custom-timer-info">
+        <div class="custom-timer-name">${t.name}</div>
+        <div class="custom-timer-status">${status} · Total: ${fmtTime(t.total)}</div>
+      </div>
+      <div class="custom-timer-btns">
+        <button class="custom-timer-btn ctb-start" onclick="toggleCustomTimer(${t.id})">
+          ${t.running ? 'Pause' : t.remaining<=0 ? 'Done' : 'Start'}
+        </button>
+        <button class="custom-timer-btn ctb-reset" onclick="resetCustomTimer(${t.id})">Reset</button>
+        <button class="custom-timer-btn ctb-delete" onclick="deleteCustomTimer(${t.id})"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 /* ----------------------------------------------------------------
@@ -923,5 +1057,6 @@ function initAll() {
   renderSimulations();
   updateDashboardStats();
   updatePomoDisplay();
+  renderCustomTimers();
   setTimeout(initScrollReveal, 300);
 }
