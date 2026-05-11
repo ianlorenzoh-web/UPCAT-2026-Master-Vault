@@ -67,6 +67,11 @@ function showSection(id, navEl) {
   const sec = document.getElementById('sec-' + id);
   if (sec) sec.classList.add('active');
 
+  // re-render section-specific grids so fade-up elements are injected
+  // into a now-visible DOM, ensuring IntersectionObserver fires correctly
+  if (id === 'other-reviewers') renderFolderReviewers();
+  if (id === 'reviewers')       renderReviewers();
+
   // update nav highlight
   if (navEl) {
     navEl.classList.add('active');
@@ -94,8 +99,8 @@ function showSection(id, navEl) {
   document.querySelector('.content').scrollTop = 0;
   window.scrollTo({ top: 0 });
 
-  // re-run scroll reveal
-  setTimeout(initScrollReveal, 80);
+  // re-run scroll reveal after display:block reflow settles
+  setTimeout(initScrollReveal, 150);
 }
 
 /* ----------------------------------------------------------------
